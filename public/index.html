@@ -801,15 +801,25 @@
       <form id="recordForm" class="modal-body">
         <div class="modal-grid" id="categoryButtons"></div>
         <input class="field" id="recordName" placeholder="项目名称" required />
-        <div class="modal-grid" style="grid-template-columns:repeat(2,1fr);">
-          <select class="field" id="recordStatus">
-            <option value="预备">预备</option>
-            <option value="进行">进行</option>
-            <option value="完结">完结</option>
-          </select>
-          <input class="field" id="recordTime" type="month" />
+        <div class="modal-grid" style="grid-template-columns: 100px 1fr 1fr; gap: 8px; align-items: end;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:700; color:var(--muted); padding-left:4px;">当前状态</label>
+            <select class="field" id="recordStatus" style="margin-top:0;">
+              <option value="预备">预备</option>
+              <option value="进行">进行</option>
+              <option value="完结">完结</option>
+            </select>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:700; color:var(--muted); padding-left:4px;">开始时间</label>
+            <input class="field" id="recordStartTime" type="date" style="margin-top:0;" />
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:700; color:var(--muted); padding-left:4px;">结束时间</label>
+            <input class="field" id="recordEndTime" type="date" style="margin-top:0;" />
+          </div>
         </div>
-        <input class="field" id="recordResult" placeholder="成果（如：A+ / Cert ID）" />
+        <input class="field" id="recordResult" placeholder="成果（如：A+ / 证书编号）" />
         <textarea class="field-text" id="recordNote" placeholder="笔记、心得或资源链接..."></textarea>
         <div class="actions">
           <button type="button" class="btn-secondary" id="cancelModal">取消</button>
@@ -982,7 +992,8 @@
     const recordForm = document.getElementById('recordForm');
     const recordName = document.getElementById('recordName');
     const recordStatus = document.getElementById('recordStatus');
-    const recordTime = document.getElementById('recordTime');
+    const recordStartTime = document.getElementById('recordStartTime');
+    const recordEndTime = document.getElementById('recordEndTime');
     const recordResult = document.getElementById('recordResult');
     const recordNote = document.getElementById('recordNote');
 
@@ -2967,7 +2978,10 @@
             const removable = getEditableTab();
             return `
               <div class="info-card ${statClass} ${isPostgradBonus(item, activeTab) ? 'postgrad-purple' : ''}" data-card-id="${item.id}">
-                ${removable ? `<button data-remove="${item.id}" style="position:absolute;right:14px;top:14px;border:none;background:#f7f9fc;color:#b6bfcc;width:30px;height:30px;border-radius:12px;cursor:pointer;z-index:10;">×</button>` : ''}
+                ${removable ? `
+                  <button data-remove="${item.id}" style="position:absolute;right:14px;top:14px;border:none;background:#fee;color:#f88;width:24px;height:24px;border-radius:8px;cursor:pointer;z-index:10;display:grid;place-items:center;font-size:14px;" title="删除记录">×</button>
+                  <button data-edit-record="${item.id}" style="position:absolute;right:44px;top:14px;border:none;background:#f0eefc;color:#7b4fcc;width:24px;height:24px;border-radius:8px;cursor:pointer;z-index:10;display:grid;place-items:center;font-size:11px;" title="修改记录">✎</button>
+                ` : ''}
                 <div>
                   <h3 class="title">${escapeHtml(item.name)}</h3>
                   ${(!isCompetitionTab(activeTab) && item.note) ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
@@ -2979,8 +2993,13 @@
                     ${relationTags.map(tag => `<span class="tag relation">#${escapeHtml(tag)}</span>`).join('')}
                     ${item.result ? `<span class="tag gray">${escapeHtml(item.result)}</span>` : ''}
                   </div>
-                  <div class="meta-row">
+                  <div class="meta-row" style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                     <span class="meta-small">${escapeHtml(getSubCategoryName(item))}</span>
+                    ${(item.startTime || item.endTime || item.time) ? `
+                      <span class="meta-small" style="font-size:11px; color:var(--muted); font-weight:600; display:flex; align-items:center; gap:3px;">
+                        📅 ${escapeHtml(item.startTime || item.time || '未指定')} 至 ${escapeHtml(item.endTime || (item.status === '完结' ? '已完结' : '进行中'))}
+                      </span>
+                    ` : ''}
                     ${item.status ? `<span class="status ${item.status === '完结' ? 's-done' : 's-run'}">${escapeHtml(item.status)}</span>` : ''}
                   </div>
                 </div>
@@ -3006,6 +3025,15 @@
         });
       });
 
+      // 1.5 Edit record button click event listeners (stops propagation to prevent details modal popup)
+      mainContent.querySelectorAll('[data-edit-record]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.editRecord;
+          openEditRecordModal(id);
+        });
+      });
+
       // 2. Click cards to open the Competition Details Modal (Optimistic and robust)
       mainContent.querySelectorAll('.info-card').forEach(card => {
         card.addEventListener('click', (e) => {
@@ -3020,14 +3048,36 @@
       });
     }
 
+    let currentEditRecordId = null; // Track currently edited growth record
+
     function openModal() {
+      currentEditRecordId = null;
       modalMask.classList.add('show');
+      document.querySelector('#modalMask .modal-title').textContent = '添加历程记录';
       recordName.value = '';
       recordStatus.value = '预备';
-      recordTime.value = '';
+      recordStartTime.value = '';
+      recordEndTime.value = '';
       recordResult.value = '';
       recordNote.value = '';
       formCategory = activeTab === '技能·进化池' ? 'skill' : activeTab === '课外·云端研习' ? 'course' : 'comp';
+      renderCategoryButtons();
+    }
+
+    function openEditRecordModal(id) {
+      currentEditRecordId = id;
+      const record = userData.find(r => String(r.id) === String(id));
+      if (!record) return;
+
+      modalMask.classList.add('show');
+      document.querySelector('#modalMask .modal-title').textContent = '修改历程记录';
+      recordName.value = record.name || '';
+      recordStatus.value = record.status || '预备';
+      recordStartTime.value = record.startTime || record.time || '';
+      recordEndTime.value = record.endTime || '';
+      recordResult.value = record.result || '';
+      recordNote.value = record.note || '';
+      formCategory = record.category || 'comp';
       renderCategoryButtons();
     }
 
@@ -3070,36 +3120,48 @@
       e.preventDefault();
       if (!recordName.value.trim()) return;
       
-      const newRecord = {
-        id: String(Date.now()), // String representation of ID
+      const isEditing = !!currentEditRecordId;
+      const recordId = isEditing ? currentEditRecordId : String(Date.now());
+
+      const recordPayload = {
+        id: recordId,
         name: recordName.value.trim(),
         category: formCategory,
         status: recordStatus.value,
-        time: recordTime.value,
+        startTime: recordStartTime.value,
+        endTime: recordEndTime.value,
         result: recordResult.value.trim(),
         note: recordNote.value.trim(),
       };
       
-      // 1. Unshift into local in-memory array immediately
-      userData.unshift(newRecord);
+      if (isEditing) {
+        // Update record in memory
+        const idx = userData.findIndex(r => String(r.id) === String(recordId));
+        if (idx >= 0) {
+          userData[idx] = recordPayload;
+        }
+      } else {
+        // Add new record to memory
+        userData.unshift(recordPayload);
+      }
       
-      // 2. Save locally if offline
+      // Save locally to browser
       saveUserDataToLocalStorage();
       
-      // 3. Immediately close modal and re-render screen
+      // Close modal and render dashboard
       closeModal();
       renderCards();
 
-      // 4. Save user record asynchronously to backend database if online
+      // Save user record asynchronously to backend database if online
       if (isHttp) {
         try {
           await fetch('/api/user-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newRecord)
+            body: JSON.stringify(recordPayload)
           });
         } catch (err) {
-          console.error('Save user record error:', err);
+          console.error('Save/Update user record error:', err);
         }
       }
     });
