@@ -45,6 +45,48 @@
       top:0;
       height:100vh;
       backdrop-filter: none;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .data-backup-card {
+      background: linear-gradient(135deg, #fbfafd 0%, #f3ebfc 100%);
+      border: 1px solid #e3d2f3;
+      border-radius: 16px;
+      padding: 12px;
+      margin-top: auto;
+    }
+    .data-backup-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #7b4fcc;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .data-backup-card-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-backup-action {
+      flex: 1;
+      border: none;
+      background: white;
+      color: #7b4fcc;
+      border: 1px solid #e3d2f3;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .btn-backup-action:hover {
+      background: #7b4fcc;
+      color: white;
+      border-color: #7b4fcc;
     }
     .brand {
       display:flex;
@@ -698,14 +740,27 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="brand">
-        <div>
-          <div class="brand-title">AI 进阶之路</div>
-          <div class="brand-sub">RECOMMENDATION CORE</div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="brand">
+          <div>
+            <div class="brand-title">AI 进阶之路</div>
+            <div class="brand-sub">RECOMMENDATION CORE</div>
+          </div>
         </div>
+
+        <div id="nav" style="padding:6px 4px 0;"></div>
       </div>
 
-      <div id="nav" style="padding:6px 4px 0;"></div>
+      <div class="data-backup-card">
+        <div class="data-backup-card-title">
+          <span>📦 数据备份与恢复</span>
+        </div>
+        <div class="data-backup-card-buttons">
+          <button class="btn-backup-action" id="exportBackupBtn" title="将当前所有填报的成绩与打卡历程导出为本地文件">导出备份</button>
+          <button class="btn-backup-action" id="importBackupBtn" title="选择已导出的备份文件，自动恢复数据并同步至服务器">导入备份</button>
+        </div>
+        <input type="file" id="backupFileInput" accept=".json" style="display:none;" />
+      </div>
     </aside>
 
     <main class="content">
@@ -3413,6 +3468,93 @@
       // 3. Render dashboard
       renderApp();
     }
+
+    // Attach Backup and Restore Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      const exportBtn = document.getElementById('exportBackupBtn');
+      const importBtn = document.getElementById('importBackupBtn');
+      const fileInput = document.getElementById('backupFileInput');
+
+      if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+          const backupData = {
+            ai_evolution_pure_v11_local: localStorage.getItem('ai_evolution_pure_v11_local'),
+            ai_plan_score_records_v1: localStorage.getItem('ai_plan_score_records_v1'),
+            ai_core_general_course_names_v1: localStorage.getItem('ai_core_general_course_names_v1')
+          };
+          
+          const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `ai_evolution_backup_${new Date().toISOString().slice(0,10)}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+      }
+
+      if (importBtn && fileInput) {
+        importBtn.addEventListener('click', () => {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            try {
+              const data = JSON.parse(event.target.result);
+              let restoreCount = 0;
+              
+              if (data.ai_evolution_pure_v11_local) {
+                localStorage.setItem('ai_evolution_pure_v11_local', data.ai_evolution_pure_v11_local);
+                restoreCount++;
+              }
+              if (data.ai_plan_score_records_v1) {
+                localStorage.setItem('ai_plan_score_records_v1', data.ai_plan_score_records_v1);
+                restoreCount++;
+              }
+              if (data.ai_core_general_course_names_v1) {
+                localStorage.setItem('ai_core_general_course_names_v1', data.ai_core_general_course_names_v1);
+                restoreCount++;
+              }
+
+              if (restoreCount === 0) {
+                alert('⚠️ 备份文件格式不正确，或不包含任何有效的历程与成绩数据！');
+                return;
+              }
+
+              // If online server mode, immediately trigger bulk sync API to upload to server
+              if (isHttp) {
+                let planScores = null;
+                let coreCourseNames = null;
+                let userData = null;
+
+                try { if (data.ai_plan_score_records_v1) planScores = JSON.parse(data.ai_plan_score_records_v1); } catch(e){}
+                try { if (data.ai_core_general_course_names_v1) coreCourseNames = JSON.parse(data.ai_core_general_course_names_v1); } catch(e){}
+                try { if (data.ai_evolution_pure_v11_local) userData = JSON.parse(data.ai_evolution_pure_v11_local); } catch(e){}
+
+                await fetch('/api/sync', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ planScores, coreCourseNames, userData })
+                });
+              }
+
+              alert('🎉 数据恢复成功！正在自动为您刷新页面。' + (isHttp ? '数据已同步并永久保存至云服务器！' : ''));
+              window.location.reload();
+            } catch (err) {
+              alert('⚠️ 无法读取备份文件，可能内容已损坏：' + err.message);
+            }
+          };
+          reader.readAsText(file);
+        });
+      }
+    });
 
     // Start full stack app
     initApp();
