@@ -753,7 +753,7 @@
 
       <div class="data-backup-card">
         <div class="data-backup-card-title">
-          <span>📦 数据备份与恢复</span>
+          <span>数据备份与恢复</span>
         </div>
         <div class="data-backup-card-buttons">
           <button class="btn-backup-action" id="exportBackupBtn" title="将当前所有填报的成绩与打卡历程导出为本地文件">导出备份</button>
@@ -3024,7 +3024,7 @@
                     <span class="meta-small">${escapeHtml(getSubCategoryName(item))}</span>
                     ${(item.startTime || item.endTime || item.time) ? `
                       <span class="meta-small" style="font-size:11px; color:var(--muted); font-weight:600; display:flex; align-items:center; gap:3px;">
-                        📅 ${escapeHtml(item.startTime || item.time || '未指定')} 至 ${escapeHtml(item.endTime || (item.status === '完结' ? '已完结' : '进行中'))}
+                        ${escapeHtml(item.startTime || item.time || '未指定')} 至 ${escapeHtml(item.endTime || (item.status === '完结' ? '已完结' : '进行中'))}
                       </span>
                     ` : ''}
                     ${item.status ? `<span class="status ${item.status === '完结' ? 's-done' : 's-run'}">${escapeHtml(item.status)}</span>` : ''}
