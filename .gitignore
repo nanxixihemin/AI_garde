@@ -1,0 +1,21 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Database & Runtime State (Keep your personal records private!)
+data/
+*.tmp
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Log files
+logs/
+*.log
+
+# Local scratch directories
+scratch/

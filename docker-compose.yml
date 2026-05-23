@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  ai-evolution-app:
+    build: .
+    container_name: ai_evolution_stage
+    restart: unless-stopped
+    ports:
+      # Maps port 3000 of the container to port 3000 of the host.
+      # If you want to use the standard web port (80), change it to "80:3000"
+      - "3000:3000"
+    volumes:
+      # Crucial: Maps host's local data folder to container's data folder.
+      # This ensures all scores, custom courses, and records are persisted 
+      # permanently on your host server even if the container is restarted or updated.
+      - ./data:/app/data
+    environment:
+      - PORT=3000

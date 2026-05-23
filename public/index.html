@@ -1,0 +1,3695 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 进阶之路 - 统一面板</title>
+  <style>
+    :root {
+      --bg:#f8f5fb;
+      --sidebar:#fffafb;
+      --panel:#fffdfd;
+      --line:#eadfee;
+      --text:#2f3747;
+      --muted:#93889d;
+      --deep:#0f1734;
+      --deep-2:#1d2942;
+      --gold:#f3cfae;
+      --green:#cfe7bf;
+      --blue:#c7ddf7;
+      --purple:#dcccf4;
+      --red:#f3c3c8;
+      --teal:#bfe7da;
+      --orange:#f6d1a6;
+      --indigo:#c8d2fb;
+      --shadow:0 14px 28px rgba(30, 40, 80, .08);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      background:linear-gradient(180deg,#fcf9fd 0%,#f6f1f8 100%);
+      color:var(--text);
+    }
+    button,input,select,textarea { font:inherit; }
+    .app {
+      min-height:100vh;
+      display:grid;
+      grid-template-columns: 292px 1fr;
+    }
+    .sidebar {
+      background:#fffdfd;
+      border-right:1px solid var(--line);
+      padding:22px 18px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      backdrop-filter: none;
+    }
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .brand-icon {
+      width:54px;height:54px;border-radius:18px;
+      background:linear-gradient(135deg,#4b7cff,#3456d8);
+      display:grid;place-items:center;
+      color:white;font-size:14px;font-weight:700;
+      box-shadow:0 10px 24px rgba(52,86,216,.25);
+    }
+    .brand-title {
+      font-size:14px;
+      font-weight:700;
+      color:#1e2c4b;
+      margin:0;
+    }
+    .brand-sub {
+      font-size:10px;
+      font-weight:600;
+      letter-spacing:.18em;
+      color:#96a0b4;
+      margin-top:6px;
+    }
+
+    .nav-section {
+      margin-top:18px;
+    }
+    .divider {
+      height:1px;
+      background:#e7dfeb;
+      margin:14px 8px 16px;
+    }
+    .nav-item {
+      width:100%;
+      border:none;
+      background:transparent;
+      color:#69768d;
+      padding:13px 16px;
+      border-radius:20px;
+      text-align:left;
+      font-size:16px;
+      font-weight:850;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      cursor:pointer;
+      transition:.18s ease;
+      margin-bottom:5px;
+    }
+    .nav-item:hover {
+      background:#f1ebf7;
+    }
+    .nav-item.active {
+      background:linear-gradient(135deg,#8f86d9 0%, #9a91df 100%);
+      color:white;
+      box-shadow:0 10px 24px rgba(141,133,216,.22);
+    }
+    .nav-icon {
+      width:26px;
+      text-align:center;
+      opacity:.95;
+      flex:0 0 26px;
+      font-size:19px;
+    }
+
+    .content {
+      padding:28px 34px 34px;
+      overflow:hidden;
+    }
+    .topbar {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
+    .header-mark {
+      display:flex;align-items:center;gap:12px;
+      color:#5c7ce7;font-weight:700;
+      margin-bottom:8px;
+    }
+    .header-title {
+      font-size:28px;
+      font-weight:700;
+      color:#26324b;
+      margin:0;
+    }
+    .header-sub {
+      margin-top:3px;
+      color:#99a2b4;
+      font-size:12px;
+      font-weight:850;
+      letter-spacing:.12em;
+    }
+    .toolbar {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .toolbar input, .toolbar select {
+      border:1px solid #edf0f6;
+      background:#fbfcfe;
+      padding:12px 16px;
+      border-radius:999px;
+      outline:none;
+      font-weight:700;
+      color:#67758a;
+      min-width:180px;
+    }
+    .toolbar .search {
+      min-width:290px;
+    }
+    .btn-primary {
+      border:none;
+      background:#4372ec;
+      color:white;
+      padding:12px 16px;
+      border-radius:999px;
+      font-weight:850;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(67,114,236,.18);
+    }
+
+    .btn-clear-filter {
+      border:1px solid #e6eaf2;
+      background:#f8f9fd;
+      color:#7b8798;
+      padding:12px 15px;
+      border-radius:999px;
+      font-weight:800;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      transition:.18s ease;
+    }
+    .btn-clear-filter:hover {
+      background:#eef2f8;
+      color:#5f6c80;
+    }
+
+    .stats-grid {
+      display:grid;
+      grid-template-columns:repeat(5,minmax(150px,1fr));
+      gap:18px;
+      margin-bottom:26px;
+    }
+    .stat-card {
+      border-radius:28px;
+      border:4px solid;
+      padding:14px 16px;
+      min-height:145px;
+      box-shadow:var(--shadow);
+      background:#ffffff;
+    }
+    .c-gold { background:#f7ecdf; border-color:#e8c9a1; }
+    .c-green { background:#edf7e8; border-color:#c7dfb2; }
+    .c-blue { background:#eef4ff; border-color:#c2d6f6; }
+    .c-purple { background:#f3edff; border-color:#d7c5f2; }
+    .c-red { background:#fff3f5; border-color:#efc6cd; }
+    .c-teal { background:#f2fbf8; border-color:#bfe1d7; }
+    .stat-title {
+      color:#6f7d90;
+      font-size:12px;
+      font-weight:600;
+    }
+    .stat-value {
+      font-size:46px;
+      font-weight:700;
+      line-height:1.12;
+      margin-top:10px;
+      color:#26324b;
+    }
+    .stat-sub {
+      margin-top:10px;
+      color:#9f97ad;
+      font-size:11px;
+      font-weight:700;
+    }
+
+    .panel-scroll {
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      padding-right:8px;
+      padding-bottom:8px;
+    }
+    .panel-scroll::-webkit-scrollbar { width:10px; }
+    .panel-scroll::-webkit-scrollbar-thumb { background:#e4e7ee; border-radius:999px; }
+
+    .semester-section {
+      margin-bottom:28px;
+    }
+    .semester-head {
+      display:flex;align-items:center;gap:12px;
+      margin-bottom:14px;
+    }
+    .semester-dot {
+      width:12px;height:12px;border-radius:999px;flex:0 0 12px;
+      box-shadow:0 0 0 6px rgba(255,255,255,.72);
+    }
+    .dot-1 { background:#cdbaf3; }
+    .dot-2 { background:#cdbaf3; }
+    .dot-3 { background:#cdbaf3; }
+    .dot-4 { background:#cdbaf3; }
+    .dot-5 { background:#cdbaf3; }
+    .dot-6 { background:#cdbaf3; }
+    .dot-7 { background:#cdbaf3; }
+    .dot-8 { background:#cdbaf3; }
+    .semester-title {
+      font-size:14px;
+      font-weight:700;
+      color:#27334b;
+      margin:0;
+    }
+    .semester-sub {
+      color:#9f95af;
+      font-size:11px;
+      font-weight:700;
+      margin-top:4px;
+    }
+
+    .course-list {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .course-row {
+      border:1px solid #edf0f6;
+      border-left:7px solid #bfd4f4;
+      border-radius:28px;
+      padding:16px 18px;
+      display:grid;
+      grid-template-columns:minmax(280px,1.6fr) auto auto auto;
+      gap:18px;
+      align-items:center;
+      background:#fffefc;
+      box-shadow:var(--shadow);
+    }
+    
+    /* 课程类型马卡龙渲染 */
+    .type-通识课 {
+      background: #faf2e8;
+      border-left: 4px solid #e2ba8e;
+    }
+    .type-专业课 {
+      background: #eef7ec;
+      border-left: 4px solid #b7d7a8;
+    }
+    .type-限选课 {
+      background: #f3edff;
+      border-left: 4px solid #cdbaf3;
+    }
+    .type-院选修 {
+      background: #edf4ff;
+      border-left: 4px solid #b7cdf5;
+    }
+
+
+    .course-main {
+      display:flex;align-items:center;gap:10px;min-width:0;
+    }
+    .course-title {
+      min-width:0;
+    }
+    .course-title h4 {
+      margin:0;
+      font-size:16px;
+      font-weight:700;
+      color:#26324b;
+      line-height:1.2;
+    }
+    .course-title p {
+      margin:8px 0 0;
+      color:#9f97ad;
+      font-size:14px;
+      font-weight:700;
+    }
+    .course-meta-line {
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      align-items:center;
+    }
+    .course-mini-tag {
+      border:1px solid #e7e1ee;
+      background:rgba(255,255,255,.76);
+      color:#7d8798;
+      border-radius:999px;
+      padding:5px 9px;
+      font-size:11px;
+      font-weight:750;
+      line-height:1;
+      white-space:nowrap;
+    }
+    .course-mini-tag.gpa-in {
+      color:#5d6fe3;
+      background:#f1f4ff;
+      border-color:#d7ddfb;
+    }
+    .course-mini-tag.gpa-out {
+      color:#9a8a55;
+      background:#fff8e9;
+      border-color:#f1dfaf;
+    }
+    .course-mini-tag.done-status {
+      color:#38a06b;
+      background:#eefbf1;
+      border-color:#c9e8d0;
+    }
+    .course-mini-tag.pending-status {
+      color:#9a94a3;
+      background:#f8f6fa;
+      border-color:#e6deec;
+    }
+    .course-note-line {
+      margin-top:8px;
+      color:#9f97ad;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.45;
+    }
+    .course-title.done .course-meta-line,
+    .course-title.done .course-note-line {
+      opacity:.74;
+    }
+    .course-title.done .course-name-input {
+      text-decoration:line-through;
+      text-decoration-thickness:2px;
+      text-decoration-color:rgba(145,145,155,.55);
+      color:#7f7b86;
+    }
+    .done h4 {
+      text-decoration:line-through;
+      text-decoration-thickness:2px;
+      text-decoration-color:rgba(155,166,185,.5);
+    }
+
+    .pill {
+      min-width:100px;
+      border-radius:18px;
+      background:rgba(255,255,255,.92);
+      border:1px solid #eceff5;
+      padding:12px 14px;
+      text-align:center;
+    }
+    .pill-label {
+      color:#a79eb2;
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .pill-value {
+      margin-top:6px;
+      color:#29354c;
+      font-size:20px;
+      font-weight:700;
+    }
+    .score-input {
+      width:108px;
+      border-radius:18px;
+      border:1px solid #e9edf5;
+      background:white;
+      padding:14px 14px;
+      text-align:center;
+      font-size:16px;
+      font-weight:700;
+      color:#26324b;
+      outline:none;
+    }
+
+    .cards-grid {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(220px,1fr));
+      gap:18px;
+    }
+    .info-card {
+      border-radius:24px;
+      padding:20px;
+      border:2px solid;
+      background:white;
+      min-height:196px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      position:relative;
+      cursor:pointer; /* Clickable cards */
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .info-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(30, 40, 80, .12);
+    }
+    .info-card.postgrad-purple {
+      background: linear-gradient(135deg, #faf7ff 0%, #f5ecff 100%);
+      border-color: #dcccf4 !important;
+    }
+    .info-card.postgrad-purple:hover {
+      box-shadow: 0 16px 34px rgba(162, 131, 224, .16);
+    }
+    .info-card .title {
+      font-size:18px;
+      font-weight:700;
+      color:#243047;
+      line-height:1.3;
+      margin:0;
+    }
+    .info-card .note {
+      margin-top:10px;
+      color:#99a4b3;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.5;
+    }
+    .tag-wrap {
+      display:flex;flex-wrap:wrap;gap:6px;
+    }
+    .tag {
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:10px;
+      font-weight:700;
+      border:1px solid;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+    .tag.rose { background:#fff1f4; color:#d85d77; border-color:#f6c9d1; }
+    .tag.orange { background:#fff6eb; color:#d58a35; border-color:#f1d4ac; }
+    .tag.blue { background:#eef6ff; color:#5384d8; border-color:#cddff8; }
+    .tag.green { background:#eefbf1; color:#56a166; border-color:#cae9d1; }
+    .tag.purple { background:#f6f1ff; color:#8d69d4; border-color:#d8c7f5; }
+    .tag.gray { background:#f8fafc; color:#7b8798; border-color:#e5eaf1; }
+
+    .tag.relation {
+      background:#f8fafc;
+      color:#657389;
+      border-color:#dfe6f2;
+      text-transform:none;
+    }
+
+    .meta-row {
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-top:14px;
+    }
+    .meta-small {
+      color:#b8aec1;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .status {
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+    }
+    .s-done { color:#37a36d; }
+    .s-run { color:#d29a2d; }
+
+    .empty {
+      min-height:360px;
+      display:grid;
+      place-items:center;
+      color:#c2c8d3;
+      font-size:28px;
+      font-style:italic;
+      font-weight:700;
+      letter-spacing:.1em;
+    }
+
+    .modal-mask {
+      position:fixed;inset:0;background:rgba(18,26,56,.55);
+      display:none;align-items:center;justify-content:center;padding:20px;
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+    }
+    .modal-mask.show { display:flex; }
+    .modal {
+      width:min(560px,100%);
+      background:white;
+      border-radius:30px;
+      box-shadow:0 20px 60px rgba(18,26,56,.22);
+      overflow:hidden;
+    }
+    .modal-head {
+      padding:24px 26px;
+      border-bottom:1px solid #f0f2f7;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .modal-title {
+      font-size:14px;font-weight:700;color:#25314a;
+    }
+    .modal-close {
+      border:none;background:#f5f7fb;color:#8f99ab;
+      width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:20px;
+    }
+    .modal-body {
+      padding:24px 26px 26px;
+      display:grid;
+      gap:14px;
+    }
+    .modal-grid {
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+    }
+    .cat-btn {
+      border:2px solid #eff2f7;background:#fafbfd;color:#8b96a9;
+      border-radius:18px;padding:12px;font-weight:700;cursor:pointer;
+    }
+    .cat-btn.active {
+      border-color:#4372ec;background:#eef4ff;color:#4372ec;
+    }
+    .field, .field-text {
+      width:100%;border:2px solid #eff2f7;background:#fafbfd;color:#25314a;
+      border-radius:18px;padding:14px 16px;outline:none;font-weight:600;
+    }
+    .field-text { min-height:100px;resize:vertical; }
+    .actions {
+      display:flex;justify-content:flex-end;gap:10px;margin-top:4px;
+    }
+    .btn-secondary {
+      border:none;background:#eef2f8;color:#5f6c80;padding:12px 16px;border-radius:999px;font-weight:700;cursor:pointer;
+    }
+
+
+    .score-input.invalid {
+      border-color:#e77786 !important;
+      background:#fff5f6 !important;
+      box-shadow:0 0 0 3px rgba(231,119,134,.16);
+    }
+
+
+    .course-title p {
+      max-width: 760px;
+    }
+
+    @media (max-width: 1300px) {
+      .stats-grid { grid-template-columns:repeat(2,minmax(160px,1fr)); }
+      .cards-grid { grid-template-columns:repeat(3,minmax(220px,1fr)); }
+      .course-row { grid-template-columns:1fr; }
+      .score-input { grid-column:auto; width:84px; }
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns:1fr; }
+      .sidebar { position:static;height:auto; }
+      .content { padding:20px; }
+      .topbar { flex-direction:column; align-items:flex-start; }
+      .cards-grid { grid-template-columns:repeat(2,minmax(220px,1fr)); }
+    }
+    @media (max-width: 720px) {
+      .stats-grid, .cards-grid { grid-template-columns:1fr; }
+      .course-row { grid-template-columns:1fr; }
+      .toolbar .search { min-width:unset;width:100%; }
+    }
+  
+    .course-row:hover {
+      box-shadow: 0 6px 16px rgba(125,102,154,.06);
+      filter: brightness(1.01);
+    }
+    .course-title.done h4 {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: rgba(155,166,185,.5);
+    }
+    .course-title.done p {
+      opacity: .72;
+    }
+
+
+    /* 当前学期整块高亮 */
+    .semester-section.current-semester {
+      background: rgba(205, 186, 243, 0.10);
+      border: 1px solid #eadff3;
+      border-radius: 22px;
+      padding: 12px 14px 14px;
+      box-shadow: 0 6px 18px rgba(141,133,216,.05);
+    }
+    .semester-section.current-semester .semester-title {
+      color: #6f63b6;
+    }
+    .semester-section.current-semester .semester-sub {
+      color: #9f97bd;
+    }
+
+    /* hover 更明显但保持轻 */
+    .course-row:hover {
+      box-shadow: 0 8px 18px rgba(125,102,154,.08);
+      filter: brightness(1.02);
+      transform: translateY(-1px);
+    }
+
+    /* 完成课程：整条更灰、更淡 */
+    .course-row.completed-row {
+      background: #f1eef4 !important;
+      border-left-color: #cfc8d8 !important;
+      border-color: #e3dde8 !important;
+    }
+    .course-row.completed-row .pill,
+    .course-row.completed-row .score-input {
+      background: #f6f3f8 !important;
+      border-color: #ddd5e6 !important;
+      color: #8c8794 !important;
+    }
+    .course-row.completed-row .pill-value,
+    .course-row.completed-row .pill-label {
+      color: #8f8897 !important;
+    }
+
+    /* 文字删除线 */
+    .course-title.done h4 {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: rgba(145,145,155,.55);
+      color: #7f7b86;
+    }
+    .course-title.done p {
+      opacity: .72;
+      color: #9b97a2;
+    }
+
+
+    .semester-nav-btn.current {
+      background: #ece6f6 !important;
+      color: #6e64b3 !important;
+      border-radius: 18px;
+    }
+
+</style>
+
+<style>
+.course-row {
+  border: 1px solid #d8cfdf !important;
+}
+
+.course-row:hover {
+  border-color: #bba7f0 !important;
+}
+</style>
+
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div>
+          <div class="brand-title">AI 进阶之路</div>
+          <div class="brand-sub">RECOMMENDATION CORE</div>
+        </div>
+      </div>
+
+      <div id="nav" style="padding:6px 4px 0;"></div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <div class="header-mark"><span id="headerMarkText">培养方案成绩</span></div>
+          <h1 class="header-title" id="headerTitle">人工智能专业课程成绩记录</h1>
+          <div class="header-sub" id="headerSub">AI GRADE PANEL · ZZU GPA</div>
+        </div>
+
+        <div class="toolbar">
+          <button id="addBtn" class="btn-primary" style="display:none;">添加新记录</button>
+          <select id="semesterFilter" style="display:none;">
+            <option value="全部">全部学期</option>
+          </select>
+          <select id="typeFilter" style="display:none;">
+            <option value="全部">全部类别</option>
+          </select>
+          <select id="relationFilter" style="display:none;">
+            <option value="全部">全部标签</option>
+          </select>
+          <input id="searchInput" class="search" type="text" placeholder="搜索课程名..." />
+          <button id="clearSearchBtn" class="btn-clear-filter" type="button" style="display:none;">清除筛选</button>
+        </div>
+      </header>
+
+      <div id="mainContent" class="panel-scroll"></div>
+    </main>
+  </div>
+
+  <!-- Regular Record Entry Modal -->
+  <div class="modal-mask" id="modalMask">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">添加记录</div>
+        <button class="modal-close" id="closeModal">×</button>
+      </div>
+      <form id="recordForm" class="modal-body">
+        <div class="modal-grid" id="categoryButtons"></div>
+        <input class="field" id="recordName" placeholder="项目名称" required />
+        <div class="modal-grid" style="grid-template-columns:repeat(2,1fr);">
+          <select class="field" id="recordStatus">
+            <option value="预备">预备</option>
+            <option value="进行">进行</option>
+            <option value="完结">完结</option>
+          </select>
+          <input class="field" id="recordTime" type="month" />
+        </div>
+        <input class="field" id="recordResult" placeholder="成果（如：A+ / Cert ID）" />
+        <textarea class="field-text" id="recordNote" placeholder="笔记、心得或资源链接..."></textarea>
+        <div class="actions">
+          <button type="button" class="btn-secondary" id="cancelModal">取消</button>
+          <button type="submit" class="btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Premium Interactive Competition Details Modal -->
+  <div class="modal-mask" id="compDetailModalMask">
+    <div class="modal" style="width: min(650px, 100%);">
+      <div class="modal-head" style="background: linear-gradient(135deg, #f5f0ff 0%, #fff 100%);">
+        <div>
+          <div class="header-mark" style="margin-bottom: 2px;">竞赛百科 & 备赛知识库</div>
+          <h2 class="modal-title" id="compDetailTitle" style="font-size: 20px; font-weight: 800; color: #1e2c4b; margin: 0;">竞赛名称</h2>
+        </div>
+        <button class="modal-close" id="closeCompModal">×</button>
+      </div>
+      <div class="modal-body" style="padding: 24px 26px; gap: 20px; max-height: 80vh; overflow-y: auto; display: flex; flex-direction: column;">
+        
+        <!-- Display Mode container -->
+        <div id="compDetailDisplayMode">
+          <div class="detail-section" style="margin-bottom: 18px;">
+            <div style="font-weight: 700; color: #6f7d90; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">常见赛道 / 组别</div>
+            <div class="tag-wrap" id="compDetailTracks">
+              <!-- Seeded tracks go here -->
+            </div>
+          </div>
+          
+          <div class="detail-section" style="margin-bottom: 18px;">
+            <div style="font-weight: 700; color: #6f7d90; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">比赛日程 / 时间线</div>
+            <div style="background: #fdfaf7; border-left: 4px solid #f6d1a6; border-radius: 16px; padding: 14px 16px; font-weight: 600; color: #50445d; line-height: 1.5; font-size: 14px;" id="compDetailTimeline">
+              每年X月-X月
+            </div>
+          </div>
+
+          <div class="detail-section" style="margin-bottom: 18px;" id="compDetailWebsiteSection">
+            <div style="font-weight: 700; color: #6f7d90; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">官方网址</div>
+            <div id="compDetailWebsiteContainer">
+              <a href="#" target="_blank" class="tag blue" style="text-transform: none; text-decoration: none; padding: 8px 14px; font-size: 13px; border-radius: 14px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700;" id="compDetailWebsite">
+                访问官方网站
+              </a>
+            </div>
+          </div>
+
+          <div class="detail-section" style="margin-bottom: 8px;">
+            <div style="font-weight: 700; color: #6f7d90; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">备赛攻略 & 个人笔记</div>
+            <div style="background: #f3f6fc; border-radius: 20px; padding: 18px; line-height: 1.6; font-size: 14px; font-weight: 600; color: #2f3747; border: 1px solid #e1e7f3; white-space: pre-wrap;" id="compDetailNote">
+              暂无笔记
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Mode container (Hidden initially) -->
+        <form id="compDetailEditForm" style="display: none; gap: 16px; flex-direction: column;">
+          <div>
+            <label style="font-weight: 700; color: #5f6c80; font-size: 13px; display: block; margin-bottom: 6px;">赛道划分 (多个赛道用中文 “，” 或英文 “,” 隔开)</label>
+            <input class="field" id="editCompTracks" placeholder="例如：主赛道,红旅赛道,产业命题赛道" required />
+          </div>
+          
+          <div>
+            <label style="font-weight: 700; color: #5f6c80; font-size: 13px; display: block; margin-bottom: 6px;">时间线 / 比赛时间</label>
+            <input class="field" id="editCompTimeline" placeholder="例如：每年4-6月校赛，10月国赛" required />
+          </div>
+
+          <div>
+            <label style="font-weight: 700; color: #5f6c80; font-size: 13px; display: block; margin-bottom: 6px;">官方网址</label>
+            <input class="field" id="editCompWebsite" placeholder="例如：https://cy.ncss.cn/" />
+          </div>
+
+          <div>
+            <label style="font-weight: 700; color: #5f6c80; font-size: 13px; display: block; margin-bottom: 6px;">备赛攻略 / 个人笔记</label>
+            <textarea class="field-text" id="editCompNote" placeholder="输入备赛建议、核心分工、或者学习资源链接..." style="min-height: 150px;"></textarea>
+          </div>
+        </form>
+
+        <!-- Actions -->
+        <div class="actions" style="margin-top: 10px; border-top: 1px solid #f0f2f7; padding-top: 16px;">
+          <button type="button" class="btn-secondary" id="editCompBtn">编辑资料</button>
+          <button type="button" class="btn-secondary" id="cancelEditCompBtn" style="display: none;">取消编辑</button>
+          <button type="button" class="btn-primary" id="saveCompBtn" style="display: none;">保存修改</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const NAV_ITEMS = [
+      { id: '培养方案成绩' },
+      { divider: true },
+      { id: '竞赛总览' },
+      { id: 'A类·综测竞赛' },
+      { id: 'B类·综测竞赛' },
+      { id: '论文·学术高地' },
+      { id: '专利·知识产权' },
+      { divider: true },
+      { id: '小试牛刀' },
+      { id: '技能·进化池' },
+      { id: '课外·云端研习' },
+      { id: '我的历程' },
+    ];
+
+    const AI_PLAN_COURSES = [{"id":1,"semester":"第一学期","type":"通识课","name":"思想道德与法治","credit":3.0},{"id":2,"semester":"第一学期","type":"通识课","name":"大学生心理健康教育","credit":2.0},{"id":3,"semester":"第一学期","type":"通识课","name":"体育（Ⅰ）","credit":1.0},{"id":4,"semester":"第一学期","type":"通识课","name":"大学英语（Ⅰ）","credit":2.0},{"id":5,"semester":"第一学期","type":"通识课","name":"军事理论","credit":1.0},{"id":6,"semester":"第一学期","type":"通识课","name":"军事技能训练","credit":2.0},{"id":7,"semester":"第一学期","type":"通识课","name":"微积分A（Ⅰ）","credit":5.0},{"id":8,"semester":"第一学期","type":"通识课","name":"线性代数","credit":3.0},{"id":9,"semester":"第一学期","type":"通识课","name":"创新创业基础","credit":1.0},{"id":10,"semester":"第一学期","type":"专业课","name":"计算学科导论","credit":1.0},{"id":11,"semester":"第一学期","type":"专业课","name":"高级语言程序设计","credit":3.0},{"id":12,"semester":"第一学期","type":"专业课","name":"高级语言程序设计实验","credit":1.0},{"id":13,"semester":"第三学期","type":"通识课","name":"毛泽东思想和中国特色社会主义理论体系概论","credit":3.0},{"id":14,"semester":"第三学期","type":"通识课","name":"中国近现代史纲要","credit":3.0},{"id":15,"semester":"第三学期","type":"通识课","name":"体育（Ⅲ）","credit":1.0},{"id":16,"semester":"第三学期","type":"通识课","name":"大学英语（Ⅲ）","credit":2.0},{"id":17,"semester":"第三学期","type":"通识课","name":"大学物理A（Ⅱ）","credit":3.0},{"id":18,"semester":"第三学期","type":"大学物理实验A（Ⅰ）","credit":1.5},{"id":19,"semester":"第三学期","type":"专业课","name":"算法设计与分析","credit":2.0},{"id":20,"semester":"第三学期","type":"专业课","name":"算法设计与分析实验","credit":1.0},{"id":21,"semester":"第三学期","type":"专业课","name":"数字逻辑与数字电路","credit":2.0},{"id":22,"semester":"第三学期","type":"专业课","name":"数字逻辑与数字电路实验","credit":1.0},{"id":23,"semester":"第三学期","type":"专业课","name":"程序设计综合课程设计","credit":2.0},{"id":24,"semester":"第三学期","type":"专业课","name":"人工智能导论","credit":2.0},{"id":25,"semester":"第三学期","type":"专业课","name":"人工智能导论实验","credit":1.0},{"id":26,"semester":"第五学期","type":"通识课","name":"职业定位与技能提升","credit":0.5},{"id":27,"semester":"第五学期","type":"专业课","name":"计算机网络","credit":3.0},{"id":28,"semester":"第五学期","type":"专业课","name":"计算机网络实验","credit":1.0},{"id":29,"semester":"第五学期","type":"专业课","name":"操作系统","credit":3.0},{"id":30,"semester":"第五学期","type":"专业课","name":"操作系统实验","credit":1.0},{"id":31,"semester":"第五学期","type":"专业课","name":"模式识别与计算机视觉","credit":3.0},{"id":32,"semester":"第五学期","type":"专业课","name":"模式识别与计算机视觉实验","credit":1.0},{"id":33,"semester":"第五学期","type":"院选修","name":"创新创业工程设计实践（Ⅰ）","credit":2.0},{"id":34,"semester":"第五学期","type":"限选课","name":"深度学习","credit":2.0},{"id":35,"semester":"第五学期","type":"院选修","name":"最优化方法","credit":2.0},{"id":36,"semester":"第七学期","type":"专业课","name":"生产实习","credit":2.0},{"id":37,"semester":"第七学期","type":"专业课","name":"人工智能综合课程设计","credit":2.0},{"id":38,"semester":"第七学期","type":"院选修","name":"大模型训练与推理","credit":2.0},{"id":39,"semester":"第七学期","type":"院选修","name":"数字图像处理","credit":2.0},{"id":40,"semester":"第七学期","type":"院选修","name":"虚拟现实技术","credit":2.0},{"id":41,"semester":"第七学期","type":"院选修","name":"计算机图形学","credit":2.0},{"id":42,"semester":"第七学期","type":"院选修","name":"自然语言处理","credit":2.0},{"id":43,"semester":"第七学期","type":"院选修","name":"人工智能伦理与安全","credit":1.0},{"id":44,"semester":"第七学期","type":"院选修","name":"并行与分布式计算","credit":2.0},{"id":45,"semester":"第七学期","type":"院选修","name":"无人机技术及应用","credit":2.0},{"id":46,"semester":"第七学期","type":"院选修","name":"多智能体系统","credit":2.0},{"id":47,"semester":"第七学期","type":"院选修","name":"DeepSeek 技术与应用","credit":2.0},{"id":48,"semester":"第七学期","type":"院选修","name":"群体智能与自主系统","credit":1.0},{"id":49,"semester":"第七学期","type":"院选修","name":"工业智能制造","credit":1.0},{"id":50,"semester":"第二学期","type":"通识课","name":"“四史”教育专题","credit":1.0},{"id":51,"semester":"第二学期","type":"通识课","name":"国家安全教育","credit":1.0},{"id":52,"semester":"第二学期","type":"通识课","name":"体育（Ⅱ）","credit":1.0},{"id":53,"semester":"第二学期","type":"通识课","name":"大学英语（Ⅱ）","credit":2.0},{"id":54,"semester":"第二学期","type":"通识课","name":"生涯发展与职业认知","credit":0.5},{"id":55,"semester":"第二学期","type":"通识课","name":"微积分A（Ⅱ）","credit":5.0},{"id":56,"semester":"第二学期","type":"通识课","name":"概率与数理统计","credit":3.0},{"id":57,"semester":"第二学期","type":"通识课","name":"大学物理A（Ⅰ）","credit":4.0},{"id":58,"semester":"第二学期","type":"专业课","name":"认知实习","credit":1.0},{"id":59,"semester":"第二学期","type":"专业课","name":"离散数学","credit":4.0},{"id":60,"semester":"第二学期","type":"专业课","name":"数据结构","credit":4.0},{"id":61,"semester":"第二学期","type":"专业课","name":"数据结构实验","credit":1.0},{"id":62,"semester":"第四学期","type":"通识课","name":"马克思主义基本原理","credit":3.0},{"id":63,"semester":"第四学期","type":"通识课","name":"习近平新时代中国特色社会主义思想概论","credit":3.0},{"id":64,"semester":"第四学期","type":"通识课","name":"体育（Ⅳ）","credit":1.0},{"id":65,"semester":"第四学期","type":"通识课","name":"大学英语（Ⅳ）","credit":2.0},{"id":66,"semester":"第四学期","type":"大学物理实验A（Ⅱ）","credit":1.5},{"id":67,"semester":"第四学期","type":"专业课","name":"计算机组成原理","credit":4.0},{"id":68,"semester":"第四学期","type":"专业课","name":"计算机组成原理实验","credit":1.0},{"id":69,"semester":"第四学期","type":"专业课","name":"机器学习","credit":3.0},{"id":70,"semester":"第四学期","type":"专业课","name":"Python 编程技术","credit":2.0},{"id":71,"semester":"第四学期","type":"限选课","name":"汇编语言","credit":2.0},{"id":72,"semester":"第四学期","type":"院选修","name":"面向对象程序设计","credit":3.0},{"id":73,"semester":"第四学期","type":"院选修","name":"计算方法","credit":2.0},{"id":74,"semester":"第六学期","type":"通识课","name":"形势与政策","credit":2.0},{"id":75,"semester":"第六学期","type":"专业课","name":"机器人学导论","credit":2.0},{"id":76,"semester":"第六学期","type":"限选课","name":"数据库系统原理","credit":3.0},{"id":77,"semester":"第六学期","type":"限选课","name":"数据库系统原理实验","credit":1.0},{"id":78,"semester":"第六学期","type":"限选课","name":"编译原理","credit":3.0},{"id":79,"semester":"第六学期","type":"限选课","name":"编译原理实验","credit":1.0},{"id":80,"semester":"第六学期","type":"院选修","name":"创新创业工程设计实践（Ⅱ）","credit":2.0},{"id":81,"semester":"第六学期","type":"院选修","name":"随机过程","credit":2.0},{"id":82,"semester":"第六学期","type":"院选修","name":"嵌入式系统导论","credit":2.0},{"id":83,"semester":"第八学期","type":"专业课","name":"毕业设计（论文）","credit":12.0},{"id":84,"semester":"第七学期","type":"院选修","name":"知识表示与处理","credit":2.0},{"id":85,"semester":"第七学期","type":"院选修","name":"智能芯片编译优化","credit":2.0},{"id":86,"semester":"第七学期","type":"通识课","name":"核心通识课程 1","credit":2.0,"note":"五类任选；此项只计毕业学分，不计入GPA","gpaIncluded":false,"editableName":true,"placeholder":"填写实际选修课程名"},{"id":87,"semester":"第七学期","type":"通识课","name":"核心通识课程 2","credit":2.0,"note":"五类任选；此项只计毕业学分，不计入GPA","gpaIncluded":false,"editableName":true,"placeholder":"填写实际选修课程名"},{"id":88,"semester":"第七学期","type":"通识课","name":"核心通识课程 3","credit":2.0,"note":"五类任选；此项只计毕业学分，不计入GPA","gpaIncluded":false,"editableName":true,"placeholder":"填写实际选修课程名"},{"id":89,"semester":"第七学期","type":"通识课","name":"核心通识课程 4","credit":2.0,"note":"五类任选；此项只计毕业学分，不计入GPA","gpaIncluded":false,"editableName":true,"placeholder":"填写实际选修课程名"}];
+    const AI_PLAN_SEMESTERS = ['第一学期','第二学期','第三学期','第四学期','第五学期','第六学期','第七学期','第八学期'];
+
+    const SUB_CATEGORIES = [{"id": "all", "name": "全部领域", "keywords": []}, {"id": "algo", "name": "算法/程序设计", "keywords": ["ACM", "程序设计", "软件", "蓝桥杯", "百度之星", "算法", "大数据", "天梯赛", "计算机设计"]}, {"id": "ai", "name": "AI/机器人", "keywords": ["机器人", "人工智能", "智能", "Robo", "AI", "深度学习", "模型"]}, {"id": "security", "name": "信息安全", "keywords": ["安全", "网络", "强网杯", "密码", "对抗", "网安"]}, {"id": "innovation", "name": "双创/综合", "keywords": ["互联网+", "挑战杯", "创客", "创新创业", "三创赛", "iCAN"]}, {"id": "paper", "name": "学术论文", "keywords": ["会议", "期刊", "SCI", "EI", "核心", "CCF"]}, {"id": "skill", "name": "技能提升", "keywords": ["开发", "语言", "框架", "工具", "底层", "C++", "Python", "PyTorch", "CUDA"]}];
+    const competitionsA = [{"id":3001,"name":"中国国际“互联网+”大学生创新创业大赛","category":"zongce-a","note":""},{"id":3002,"name":"“挑战杯”全国大学生课外学术科技作品竞赛","category":"zongce-a","note":""},{"id":3003,"name":"“挑战杯”中国大学生创业计划大赛","category":"zongce-a","note":""},{"id":3004,"name":"ACM-ICPC 国际大学生程序设计竞赛","category":"zongce-a","note":""},{"id":3005,"name":"全国大学生数学建模竞赛","category":"zongce-a","note":""},{"id":3006,"name":"全国大学生电子设计竞赛","category":"zongce-a","note":""},{"id":3007,"name":"中国大学生医学技术技能大赛","category":"zongce-a","note":""},{"id":3008,"name":"全国大学生机械创新设计大赛","category":"zongce-a","note":""},{"id":3009,"name":"全国大学生结构设计竞赛","category":"zongce-a","note":""},{"id":3010,"name":"全国大学生广告艺术大赛","category":"zongce-a","note":""},{"id":3011,"name":"全国大学生智能汽车竞赛","category":"zongce-a","note":""},{"id":3012,"name":"全国大学生电子商务“创新、创意及创业”挑战赛","category":"zongce-a","note":""},{"id":3013,"name":"中国大学生工程实践与创新能力大赛","category":"zongce-a","note":""},{"id":3014,"name":"全国大学生物流设计大赛","category":"zongce-a","note":""},{"id":3015,"name":"外研社全国大学生英语系列赛：英语演讲、英语辩论、英语写作、英语阅读","category":"zongce-a","note":""},{"id":3016,"name":"两岸新锐设计竞赛·华灿奖","category":"zongce-a","note":""},{"id":3017,"name":"全国大学生创新创业训练计划年会展示","category":"zongce-a","note":""},{"id":3018,"name":"全国大学生化工设计竞赛","category":"zongce-a","note":""},{"id":3019,"name":"全国大学生机器人大赛：RoboMaster、RoboCon","category":"zongce-a","note":""},{"id":3020,"name":"全国大学生市场调查与分析大赛","category":"zongce-a","note":""},{"id":3021,"name":"全国大学生先进成图技术与产品信息建模创新大赛","category":"zongce-a","note":""},{"id":3022,"name":"全国三维数字化创新设计大赛","category":"zongce-a","note":""},{"id":3023,"name":"“西门子杯”中国智能制造挑战赛","category":"zongce-a","note":""},{"id":3024,"name":"中国大学生服务外包创新创业大赛","category":"zongce-a","note":""},{"id":3025,"name":"中国大学生计算机设计大赛","category":"zongce-a","note":""},{"id":3026,"name":"中国高校计算机大赛：大数据挑战赛、团体程序设计天梯赛、移动应用创新赛、网络技术挑战赛、人工智能创意赛","category":"zongce-a","note":""},{"id":3027,"name":"蓝桥杯全国软件和信息技术专业人才大赛","category":"zongce-a","note":""},{"id":3028,"name":"米兰设计周-中国高校设计学科师生优秀作品展","category":"zongce-a","note":""},{"id":3029,"name":"全国大学生地质技能竞赛","category":"zongce-a","note":""},{"id":3030,"name":"全国大学生光电设计竞赛","category":"zongce-a","note":""},{"id":3031,"name":"全国大学生集成电路创新创业大赛","category":"zongce-a","note":""},{"id":3032,"name":"全国大学生金相技能大赛","category":"zongce-a","note":""},{"id":3033,"name":"全国大学生信息安全竞赛","category":"zongce-a","note":""},{"id":3034,"name":"未来设计师·全国高校数字艺术设计大赛","category":"zongce-a","note":""},{"id":3035,"name":"全国周培源大学生力学竞赛","category":"zongce-a","note":""},{"id":3036,"name":"中国大学生机械工程创新创意大赛","category":"zongce-a","note":""},{"id":3037,"name":"中国机器人大赛暨 RoboCup 机器人世界杯中国赛","category":"zongce-a","note":""},{"id":3038,"name":"“中国软件杯”大学生软件设计大赛","category":"zongce-a","note":""},{"id":3039,"name":"中美青年创客大赛","category":"zongce-a","note":""},{"id":3040,"name":"睿抗机器人开发者大赛（RAICOM）","category":"zongce-a","note":""},{"id":3041,"name":"“大唐杯”全国大学生新一代信息通信技术大赛","category":"zongce-a","note":""},{"id":3042,"name":"华为 ICT 大赛","category":"zongce-a","note":""},{"id":3043,"name":"全国大学生嵌入式芯片与系统设计竞赛","category":"zongce-a","note":""},{"id":3044,"name":"全国大学生生命科学竞赛（CULSC）","category":"zongce-a","note":""},{"id":3045,"name":"全国大学生物理实验竞赛","category":"zongce-a","note":""},{"id":3046,"name":"全国高校 BIM 毕业设计创新大赛","category":"zongce-a","note":""},{"id":3047,"name":"全国高校商业精英挑战赛：品牌策划竞赛、会展专业创新创业实践竞赛、国际贸易竞赛、创新创业竞赛、会计与商业管理案例竞赛","category":"zongce-a","note":""},{"id":3048,"name":"“学创杯”全国大学生创业综合模拟大赛","category":"zongce-a","note":""},{"id":3049,"name":"中国高校智能机器人创意大赛","category":"zongce-a","note":""},{"id":3050,"name":"中国好创意暨全国数字艺术设计大赛","category":"zongce-a","note":""},{"id":3051,"name":"中国机器人及人工智能大赛","category":"zongce-a","note":""},{"id":3052,"name":"全国大学生节能减排社会实践与科技竞赛","category":"zongce-a","note":""},{"id":3053,"name":"“21 世纪杯”全国英语演讲比赛","category":"zongce-a","note":""},{"id":3054,"name":"iCAN 大学生创新创业大赛","category":"zongce-a","note":""},{"id":3055,"name":"“工行杯”全国大学生金融科技创新大赛","category":"zongce-a","note":""},{"id":3056,"name":"中华经典诵写讲大赛","category":"zongce-a","note":""},{"id":3057,"name":"“外教社杯”全国高校学生跨文化能力大赛","category":"zongce-a","note":""},{"id":3058,"name":"百度之星·程序设计大赛","category":"zongce-a","note":""},{"id":3059,"name":"全国大学生工业设计大赛","category":"zongce-a","note":""},{"id":3060,"name":"全国大学生水利创新设计大赛","category":"zongce-a","note":""},{"id":3061,"name":"全国大学生化工实验大赛","category":"zongce-a","note":""},{"id":3062,"name":"全国大学生化学实验创新设计大赛","category":"zongce-a","note":""},{"id":3063,"name":"全国大学生计算机系统能力大赛","category":"zongce-a","note":""},{"id":3064,"name":"全国大学生花园设计建造竞赛","category":"zongce-a","note":""},{"id":3065,"name":"全国大学生物联网设计竞赛","category":"zongce-a","note":""},{"id":3066,"name":"全国大学生信息安全与对抗技术竞赛","category":"zongce-a","note":""},{"id":3067,"name":"全国大学生测绘学科创新创业智能大赛","category":"zongce-a","note":""},{"id":3068,"name":"全国大学生统计建模大赛","category":"zongce-a","note":""},{"id":3069,"name":"全国大学生能源经济学术创意大赛","category":"zongce-a","note":""},{"id":3070,"name":"全国大学生基础医学创新研究暨实验设计论坛大赛","category":"zongce-a","note":""},{"id":3071,"name":"全国大学生数字媒体科技作品及创意竞赛","category":"zongce-a","note":""},{"id":3072,"name":"全国本科院校税收风险管控案例大赛","category":"zongce-a","note":""},{"id":3073,"name":"全国企业竞争模拟大赛","category":"zongce-a","note":""},{"id":3074,"name":"全国商务院校数字化企业经营沙盘大赛","category":"zongce-a","note":""},{"id":3075,"name":"全国数字建筑创新应用大赛","category":"zongce-a","note":""},{"id":3076,"name":"全球校园人工智能算法精英大赛","category":"zongce-a","note":""},{"id":3077,"name":"国际大学生智能农业装备创新大赛","category":"zongce-a","note":""},{"id":3078,"name":"“科云杯”全国大学生财会职业能力大赛","category":"zongce-a","note":""}];
+    const competitionsB = [{"id":4001,"name":"批改网百万同题英语写作活动","category":"zongce-b","note":""},{"id":4002,"name":"全国大学生英语竞赛","category":"zongce-b","note":""},{"id":4003,"name":"全国大学生计算机技能应用大赛","category":"zongce-b","note":""},{"id":4004,"name":"全国高等院校数学能力挑战赛","category":"zongce-b","note":""},{"id":4005,"name":"美国大学生数学建模大赛","category":"zongce-b","note":""},{"id":4006,"name":"全国大学生翻译大赛","category":"zongce-b","note":""},{"id":4007,"name":"全国大学生电子商务三创赛","category":"zongce-b","note":""},{"id":4008,"name":"河南省本科高校及职业院校信息安全对抗大赛","category":"zongce-b","note":""},{"id":4009,"name":"国际先进机器人及仿真技术大赛","category":"zongce-b","note":""},{"id":4010,"name":"中国大学生程序设计竞赛","category":"zongce-b","note":""},{"id":4011,"name":"“强网杯”全国网络安全挑战赛","category":"zongce-b","note":""},{"id":4012,"name":"全国大学生信息安全竞赛创新实践能力赛","category":"zongce-b","note":""},{"id":4013,"name":"河南省机器人大赛","category":"zongce-b","note":""},{"id":4014,"name":"AIIA 杯人工智能巡回赛","category":"zongce-b","note":""},{"id":4015,"name":"河南省大学生程序设计竞赛","category":"zongce-b","note":""},{"id":4016,"name":"天博杯科技创新大赛","category":"zongce-b","note":""},{"id":4017,"name":"五一数学建模大赛","category":"zongce-b","note":""},{"id":4018,"name":"“数维杯”全国大学生数学建模竞赛","category":"zongce-b","note":""},{"id":4019,"name":"中能融和杯工控安全竞赛","category":"zongce-b","note":""},{"id":4020,"name":"全国大学生算法设计与编程挑战赛","category":"zongce-b","note":""},{"id":4021,"name":"MathorCup 高校数学建模挑战赛","category":"zongce-b","note":""},{"id":4022,"name":"“绿城杯”网络安全大赛","category":"zongce-b","note":""},{"id":4023,"name":"“嵩山杯”生态应用挑战赛","category":"zongce-b","note":""},{"id":4024,"name":"“先导杯”计算应用大奖赛","category":"zongce-b","note":""},{"id":4025,"name":"人工智能创意赛","category":"zongce-b","note":""},{"id":4026,"name":"“英特尔杯”全国并行应用挑战赛（PAC）","category":"zongce-b","note":""},{"id":4027,"name":"“神威杯”国产 CPU 并行应用挑战赛（CPC）","category":"zongce-b","note":""}]
+
+    const RELATION_TAGS = [
+      '算法', 'AI/机器人', '信息安全', '建模', '英语', '软件开发', '电子/通信', '嵌入式/硬件',
+      '创新创业', '设计艺术', '经管商科', '工程制造', '数学基础', '生命医学', '化工材料', '能源环境', '综合'
+    ];
+
+    const RELATION_TAG_RULES = [
+      { tag: '英语', keywords: ['英语', '外研社', '21世纪杯', '批改网', '翻译', '跨文化', '写作', '演讲', '辩论', '阅读'] },
+      { tag: '建模', keywords: ['数学建模', '建模', '市场调查与分析', '统计建模', 'MathorCup', '五一数学', '数维杯', '统计'] },
+      { tag: '算法', keywords: ['ACM', 'ICPC', '程序设计', '算法', '编程', '蓝桥杯', '百度之星', '天梯赛', '软件和信息技术'] },
+      { tag: 'AI/机器人', keywords: ['人工智能', '机器人', 'Robo', 'RAICOM', '智能汽车', '智能机器人', '智能农业', 'AIIA', '无人机', '智能制造'] },
+      { tag: '信息安全', keywords: ['信息安全', '网络安全', '强网杯', '对抗', '工控安全', '绿城杯', '密码'] },
+      { tag: '软件开发', keywords: ['软件', '服务外包', '移动应用', '计算机设计', '软件杯', '计算机技能', '应用开发', '数字化创新设计'] },
+      { tag: '电子/通信', keywords: ['电子设计', '光电', '大唐杯', '通信', 'ICT', '集成电路', '电路', '信通'] },
+      { tag: '嵌入式/硬件', keywords: ['嵌入式', '芯片', 'CPU', '物联网', '并行应用', '智能芯片', '单片机', '硬件'] },
+      { tag: '创新创业', keywords: ['创新创业', '互联网+', '挑战杯', '创客', '三创', 'iCAN', '创业', '学创杯', '金融科技', '创业计划'] },
+      { tag: '设计艺术', keywords: ['设计', '广告', '数字艺术', '好创意', '华灿', '工业设计', '数字媒体', '米兰设计', '未来设计师'] },
+      { tag: '经管商科', keywords: ['电子商务', '物流', '市场调查', '商业', '金融科技', '企业竞争', '财会', '税收', '商务', '会展', '国际贸易', '会计'] },
+      { tag: '工程制造', keywords: ['机械', '结构', 'BIM', '智能制造', '工程实践', '制造', '汽车', '成图', '建筑', '土木', '水利'] },
+      { tag: '数学基础', keywords: ['数学', '物理', '力学', '计算方法', '高等院校数学能力', '花园设计建造'] },
+      { tag: '生命医学', keywords: ['医学', '生命科学', '生物', '农业装备'] },
+      { tag: '化工材料', keywords: ['化工', '化学', '金相', '材料'] },
+      { tag: '能源环境', keywords: ['节能减排', '能源', '环境', '测绘', '地质'] }
+    ];
+
+    const academicPapers = [{"id":1,"name":"CCF B 类及以上会议/期刊；中科院二区及以上期刊；卓越行动计划“领军/重点期刊”","note":"10分；学生第一作者 + 本院指导教师第二作者或通讯作者；署名须符合学院要求"},{"id":2,"name":"CCF C 类会议/期刊；中科院三区期刊；卓越行动计划“梯队期刊”","note":"8分；学生第一作者 + 本院指导教师第二作者或通讯作者；署名须符合学院要求"},{"id":3,"name":"SCI 或 SSCI 期刻；卓越行动计划“高起点期刊”","note":"6分；学生第一作者 + 本院指导教师第二作者或通讯作者；内容与本专业相关"},{"id":4,"name":"EI 期刊或中文核心论文","note":"4分；长文；该类论文至多累计1篇"},{"id":5,"name":"EI 会议论文","note":"2分；需提供论文全文和相关参会证明材料"},{"id":6,"name":"其他核心期刊论文","note":"0.5分；长文；该类论文至多累计1篇"}];
+    const patents = [{"id":1,"name":"国家发明专利（授权）","note":"10分；学生第一完成人；必须有本院教师参加；署名均为郑州大学；内容与本专业相关"},{"id":2,"name":"实用新型 / 外观设计专利（需谨慎核对）","note":"附件备注提到“至多累计2项”，但本页未给出明确分值；不要直接按10分计算，需以学院解释为准"}];
+
+    // LocalStorage keys for legacy data detection and sync
+    const STORAGE_USER = 'ai_evolution_pure_v11_local';
+    const STORAGE_PLAN = 'ai_plan_score_records_v1';
+    const STORAGE_CORE_NAMES = 'ai_core_general_course_names_v1';
+
+    // Protocol check to support both client-only LocalStorage mode and full-stack API mode
+    const isHttp = window.location.protocol.startsWith('http');
+
+    let activeTab = '培养方案成绩';
+    let searchTerm = '';
+    let selectedSemester = '全部';
+    let selectedType = '全部';
+    let selectedRelationTag = '全部';
+    let userData = [];
+    let planScores = {};
+    let coreCourseNames = {};
+    let formCategory = 'comp';
+
+    const navEl = document.getElementById('nav');
+    const headerMarkText = document.getElementById('headerMarkText');
+    const headerTitle = document.getElementById('headerTitle');
+    const headerSub = document.getElementById('headerSub');
+    const mainContent = document.getElementById('mainContent');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const addBtn = document.getElementById('addBtn');
+    const semesterFilter = document.getElementById('semesterFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const relationFilter = document.getElementById('relationFilter');
+    const modalMask = document.getElementById('modalMask');
+    const categoryButtons = document.getElementById('categoryButtons');
+    const recordForm = document.getElementById('recordForm');
+    const recordName = document.getElementById('recordName');
+    const recordStatus = document.getElementById('recordStatus');
+    const recordTime = document.getElementById('recordTime');
+    const recordResult = document.getElementById('recordResult');
+    const recordNote = document.getElementById('recordNote');
+
+
+    function hasActiveToolbarFilter() {
+      if (activeTab === '培养方案成绩') {
+        return Boolean(searchTerm) || selectedSemester !== '全部' || selectedType !== '全部';
+      }
+      if (isCompetitionTab(activeTab)) {
+        return Boolean(searchTerm) || selectedRelationTag !== '全部';
+      }
+      return Boolean(searchTerm);
+    }
+
+    function syncToolbarState() {
+      if (searchInput.value !== searchTerm) searchInput.value = searchTerm;
+      clearSearchBtn.style.display = hasActiveToolbarFilter() ? 'inline-flex' : 'none';
+    }
+
+    function resetToolbarState({ resetPlanFilters = false } = {}) {
+      searchTerm = '';
+      searchInput.value = '';
+      selectedRelationTag = '全部';
+      if (resetPlanFilters) {
+        selectedSemester = '全部';
+        selectedType = '全部';
+      }
+      syncToolbarState();
+    }
+
+    function normalizeScore(score) {
+      if (score === '' || score === null || score === undefined) return '';
+      const n = Number(score);
+      if (!Number.isFinite(n) || n < 0 || n > 100) return '';
+      return n;
+    }
+
+    function hasValidScore(score) {
+      return normalizeScore(score) !== '';
+    }
+
+    function formatCredit(value) {
+      const n = Number(value || 0);
+      if (!Number.isFinite(n)) return '0';
+      const fixed = Math.round(n * 10) / 10;
+      return Number.isInteger(fixed) ? String(fixed) : fixed.toFixed(1);
+    }
+
+    function isGpaIncluded(course) {
+      return course && course.gpaIncluded !== false;
+    }
+
+    function getCourseDisplayName(course) {
+      if (!course) return '';
+      const custom = coreCourseNames[course.id];
+      return course.editableName && custom ? custom : course.name;
+    }
+
+    function validateScoreInput(inputEl) {
+      const raw = String(inputEl.value ?? '').trim();
+      if (raw === '') {
+        inputEl.classList.remove('invalid');
+        inputEl.setCustomValidity('');
+        inputEl.title = '';
+        return { valid: true, empty: true, value: '' };
+      }
+
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n < 0 || n > 100) {
+        inputEl.classList.add('invalid');
+        inputEl.setCustomValidity('成绩必须是 0 到 100 之间的数字');
+        inputEl.title = '成绩必须是 0 到 100 之间的数字';
+        inputEl.reportValidity();
+        return { valid: false, empty: false, value: null };
+      }
+
+      inputEl.classList.remove('invalid');
+      inputEl.setCustomValidity('');
+      inputEl.title = '';
+      return { valid: true, empty: false, value: n };
+    }
+
+    function scoreToGpa(score) {
+      const n = normalizeScore(score);
+      if (n === '') return '';
+      if (n >= 90) return 4.0;
+      if (n >= 85) return 3.7;
+      if (n >= 80) return 3.2;
+      if (n >= 75) return 2.7;
+      if (n >= 70) return 2.2;
+      if (n >= 65) return 1.7;
+      if (n >= 60) return 1.2;
+      return 0.0;
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+
+    function getPostgradBonusTags(name) {
+      const tags = [];
+      const normalized = String(name || '').replace(/\s+/g, '');
+
+      // 1. 保研 T1 顶级加分: 20/15/10分
+      if (
+        (normalized.includes('中国国际') && (normalized.includes('互联网+') || normalized.includes('创新大赛') || normalized.includes('创新创业大赛'))) ||
+        normalized.includes('互联网+大学生创新创业') ||
+        normalized.includes('课外学术科技作品')
+      ) {
+        tags.push({ text: '保研 T1: 20/15/10分', type: 'rose' });
+        return tags;
+      }
+
+      // 2. 保研 T2 核心加分: 10/7/4分
+      const t2Keywords = [
+        '挑战杯中国大学生创业计划大赛',
+        '创业计划大赛',
+        '创新创业训练计划年会展示',
+        'ACM-ICPC', 'ACM/ICPC', '国际大学生程序设计竞赛',
+        '全国大学生数学建模竞赛', '数学建模竞赛',
+        'RoboCup', '机器人世界杯',
+        '机器人大赛', 'RoboMaster', 'RoboCon',
+        '电子设计竞赛',
+        '西门子杯', '智能制造挑战赛',
+        '计算机设计大赛',
+        '服务外包创新创业大赛',
+        '中国高校计算机大赛'
+      ];
+      if (t2Keywords.some(kw => normalized.includes(kw.replace(/\s+/g, '')))) {
+        tags.push({ text: '保研 T2: 10/7/4分', type: 'orange' });
+        return tags;
+      }
+
+      // 3. 保研 T3 重要加分: 5/4/3分
+      const t3Explicit = [
+        '神威杯', 'CPC', '英特尔杯', 'PAC', '先导杯', '嵩山杯', '强网杯'
+      ];
+      const t3ComputerRelated = [
+        '蓝桥杯',
+        '全国大学生信息安全竞赛',
+        '信息安全竞赛',
+        '中国软件杯',
+        '睿抗机器人', 'RAICOM',
+        '大唐杯',
+        '华为ICT', '华为高级ICT',
+        '嵌入式芯片',
+        '智能机器人',
+        '中国机器人及人工智能',
+        '百度之星',
+        '计算机系统能力',
+        '物联网设计竞赛',
+        '信息安全与对抗',
+        '全球校园人工智能算法精英大赛',
+        '智能农业装备',
+        '程序设计',
+        '网络安全',
+        '计算机技能应用大赛'
+      ];
+      if (
+        t3Explicit.some(kw => normalized.includes(kw.replace(/\s+/g, ''))) ||
+        t3ComputerRelated.some(kw => normalized.includes(kw.replace(/\s+/g, '')))
+      ) {
+        tags.push({ text: '保研 T3: 5/4/3分', type: 'blue' });
+      }
+
+      return tags;
+    }
+
+
+
+    function isCompetitionTab(tab = activeTab) {
+      return ['竞赛总览', 'A类·综测竞赛', 'B类·综测竞赛'].includes(tab);
+    }
+
+    function getRelationTags(item) {
+      if (!item || !item.name) return [];
+      const name = String(item.name || '');
+      const compact = name.replace(/\s+/g, '').toLowerCase();
+      const matched = [];
+
+      RELATION_TAG_RULES.forEach(rule => {
+        const hit = rule.keywords.some(kw => compact.includes(String(kw).replace(/\s+/g, '').toLowerCase()));
+        if (hit) matched.push(rule.tag);
+      });
+
+      return matched.length ? Array.from(new Set(matched)) : ['综合'];
+    }
+
+    function renderRelationFilterOptions(data) {
+      const available = RELATION_TAGS.filter(tag =>
+        data.some(item => getRelationTags(item).includes(tag))
+      );
+      if (selectedRelationTag !== '全部' && !available.includes(selectedRelationTag)) {
+        selectedRelationTag = '全部';
+      }
+      relationFilter.innerHTML = `
+        <option value="全部" ${selectedRelationTag === '全部' ? 'selected' : ''}>全部标签</option>
+        ${available.map(tag => `<option value="${tag}" ${selectedRelationTag === tag ? 'selected' : ''}>${tag}</option>`).join('')}
+      `;
+    }
+
+    function getCompTags(item, currentTab) {
+      if (!item || !item.name) return [];
+      let tags = [];
+      const name = item.name;
+
+      if (item.category === 'zongce-a') {
+        tags.push({ text: '综测 A类', type: 'blue' });
+        tags.push({ text: '综测国奖: 4.5/3/2/1.5/0.5', type: 'green' });
+        tags.push(...getPostgradBonusTags(name));
+        return tags;
+      }
+      if (item.category === 'zongce-b') {
+        tags.push({ text: '综测 B类', type: 'purple' });
+        tags.push({ text: '综测国奖: 2/1.5/1.2/1/0.45', type: 'green' });
+        tags.push(...getPostgradBonusTags(name));
+        return tags;
+      }
+
+      if (currentTab === '论文·学术高地') tags.push({ text: '保研科创: 最高10分', type: 'rose' });
+      else if (currentTab === '专利·知识产权' && name.includes('国家发明专利')) tags.push({ text: '保研科创: 10分', type: 'rose' });
+      else {
+        const bonusTags = getPostgradBonusTags(name);
+        if (bonusTags.length) tags.push(...bonusTags);
+        else tags.push({ text: '普通综测加分', type: 'gray' });
+      }
+
+      if (item.category === 'course') tags.push({ text: 'Coursera/MOOC', type: 'purple' });
+      if (item.category === 'skill') tags.push({ text: '核心技能', type: 'green' });
+
+      return tags;
+    }
+
+    function isPostgradBonus(item, currentTab) {
+      if (!item || !item.name) return false;
+      if (currentTab === '论文·学术高地') return true;
+      if (currentTab === '专利·知识产权' && item.name.includes('国家发明专利')) return true;
+      return getPostgradBonusTags(item.name).length > 0;
+    }
+
+    function getSubCategoryName(item) {
+      if (!item || !item.name) return '未知领域';
+      if (item.category === 'skill') return '技能进化';
+      if (item.category === 'course') return '云端研习';
+      if (item.category === 'comp') return '个人收藏';
+      if (item.category === 'zongce-a') return '综测 A 类目录';
+      if (item.category === 'zongce-b') return '综测 B 类目录';
+
+      const found = SUB_CATEGORIES.find(c =>
+        (c.keywords && c.keywords.some(kw => item.name.toLowerCase().includes(kw.toLowerCase()))) ||
+        (item.category && item.category === c.id)
+      );
+      return found ? found.name : '综合领域';
+    }
+
+    // Local Storage Loading Helpers (Graceful offline fallback)
+    function loadUserDataFromLocalStorage() {
+      const raw = localStorage.getItem(STORAGE_USER);
+      if (raw) {
+        try {
+          userData = JSON.parse(raw);
+          if (!Array.isArray(userData)) userData = [];
+        } catch(e) {
+          userData = [];
+        }
+      } else {
+        userData = [
+          { id: 'd1', name: 'Coursera: Deep Learning Specialization', category: 'course', status: '进行', time: '2026-05', result: 'Certifying', note: '吴恩达深度学习课程' },
+          { id: 'd2', name: 'CUDA 并行计算初探', category: 'skill', status: '预备', time: '2026-08', result: '', note: '计划自学底层GPU加速' }
+        ];
+      }
+    }
+
+    function saveUserDataToLocalStorage() {
+      localStorage.setItem(STORAGE_USER, JSON.stringify(userData));
+    }
+
+    // LocalStorage seed details fallback for offline mode
+    const OFFLINE_SEED_DETAILS = {
+  "3001": {
+    "id": 3001,
+    "tracks": [
+      "高教主赛道：本科生创意组 (未注册公司的优秀科技/创意项目)",
+      "高教主赛道：初创组 (注册时间在3年内且学生为法人代表的项目)",
+      "高教主赛道：成长组 (高增长潜力且已获得首轮融资的科技项目)",
+      "“青年红色筑梦之旅”赛道：红旅公益组 (偏向乡村振兴、社会公益服务项目)",
+      "“青年红色筑梦之旅”赛道：红旅创意组/创业组",
+      "产业命题赛道：由华为、腾讯等头部大厂发布企业技术瓶颈命题，学生组队攻关"
+    ],
+    "timeline": "每年4月-6月举办校赛与选拔，7月-8月举办省赛（省一等奖推荐国赛），10月全国总决赛金奖答辩与金奖争夺。",
+    "website": "https://cy.ncss.cn/",
+    "note": "【保研 T1: 20/15/10分 顶级加分】全国级别最高、加分权重封顶的双创赛事！对于计算机专业，最容易出彩的是高教主赛道和产业命题赛道。备赛核心秘诀：\n1. 【团队构建】：必须跨学科组建 5-15 人团队，铁三角结构：计算机同学负责研发硬核技术与开发 Demo 展示系统（占 30%），美院同学设计极其精美的路演 PPT 与解说视频（占 30%），商学院同学进行精细的市场调研、财务测算与商业闭环分析并负责现场 PPT 演讲路演（占 40%）；\n2. 【核心卖点】：技术必须有壁垒，偏向“AI+传统行业落地”或“前沿硬科技研发”（如大模型微调部署、智慧医疗、边缘计算芯片应用）；\n3. 【硬核材料】：必须准备一份长达 50-80 页排版精美的商业计划书（BP）、一个 5 分钟极其高亢煽动的路演 PPT、以及一段 1 分钟的项目成果展示短视频。"
+  },
+  "3002": {
+    "id": 3002,
+    "tracks": [
+      "自然科学学术论文组 (限理科本科生参赛，须发表高水平CCF/中科院论文)",
+      "科技发明制作A类 (高水平科研硬件、大型软件系统、底层编译器与芯片设计)",
+      "科技发明制作B类 (中小型实用研发、移动端App应用、大模型创意应用作品)",
+      "哲学社会科学类社会调查报告和学术论文组 (文理交叉学科)"
+    ],
+    "timeline": "每奇数年举办（如2027年）。前一年9月-11月校赛选拔，当年3月-5月省赛，11月全国决赛。",
+    "website": "http://www.tiaozhanbei.net/",
+    "note": "【保研 T1: 20/15/10分 顶级加分】被誉为中国大学生学术科技的“奥林匹克”。含金量极重，强调“课外学术”与“科技硬实力”。\n1. 【自然科学论文组】：必须以郑州大学为第一单位发表或录用高水平 SCI/CCF 论文，且学生为第一作者（或导师一作学生二作），指导老师必须重点指导并站台；\n2. 【科技发明A类】：最适合计算机专业学生。必须制造出高完成度的软硬件实物系统（如手写RISC-V芯片配合系统软件、高难度CTF防御系统等）。需要提交长达百页的技术发明说明书、专利授权证书、省部级以上查新报告以及第三方性能评测报告。"
+  },
+  "3003": {
+    "id": 3003,
+    "tracks": [
+      "科技创新和未来产业组 (聚焦人工智能、大数据、芯片、量子计算前沿领域)",
+      "乡村振兴和农业农村组 (偏向智慧农业、农产品追踪与智慧物流)",
+      "生态文明建设和绿色低碳组 (契合双碳目标、新能源控制、绿色计算)",
+      "区域协调发展和城市治理组 (如智慧社区、物联网交通、智能安防)",
+      "文化创意和区域合作组 (文旅大模型应用、数字文创等)"
+    ],
+    "timeline": "每偶数年举办（如2026年）。当年3月-5月省级复赛，10月/11月全国终审决赛。",
+    "website": "http://www.tiaozhanbei.net/",
+    "note": "【保研 T2: 10/7/4分 核心加分】相较于“大挑战杯”侧重学术科研，小挑战杯更侧重于项目的“商业可行性”、“社会价值”以及“落地运营”。\n1. 【评分要点】：不仅看项目技术有多硬，更看重它能解决什么真实的社会痛点，是否已经产生了真实的营业收入、用户量或签署了商业订单；\n2. 【申报建议】：建议携带自己本组的“大创项目”或“互联网+”项目做针对性商业包装后参赛。团队中同样需要高水准的商科演讲人和设计美工，精美的 PPT 展示与富有激情的路演是获胜的法宝。"
+  },
+  "3004": {
+    "id": 3004,
+    "tracks": [
+      "全国邀请赛 / 省级程序设计竞赛 (暖身与历练)",
+      "亚洲区东大陆分站赛 (Regional - 多个赛区现场对抗)",
+      "亚洲区东大陆决赛 (EC-Final - 顶级战队交锋)",
+      "全球总决赛 (World Finals - 殿堂级排位)"
+    ],
+    "timeline": "每年9月-11月举办各分站赛现场赛，11-12月EC-Final，次年上半年世界总决赛。",
+    "website": "https://icpc.global/",
+    "note": "【保研 T2: 10/7/4分 核心加分】计算机专业程序员含金量第一、保研面试直通车、难度最高的算法挑战赛。3人一组，共享一台电脑，5小时限时用 C++/Java/Python 解 10-13 道极难的英文算法题。\n1. 【备赛心法】：难度极高，大一必须进入校算法集训队。日常训练必须高强度刷完 Codeforces (积分需达到 1800+ 橙名水平)、AtCoder、以及 ICPC 历年区域赛真题；\n2. 【团队配合】：必须进行精确的分工：1人主攻数论、组合数学与几何算法（数学手），1人主攻图论、网络流与动态规划（图论手），1人主攻高难度数据结构与超快速手写代码（键盘手/代码机器）；\n3. 【竞赛策略】：现场先切简单题（手速题），中期中等题合理安排上机调试与离线纸上推导，最后1小时高难度题合力攻坚，严控提交错误（罚时）。"
+  },
+  "3005": {
+    "id": 3005,
+    "tracks": [
+      "A题：连续建模题 (通常偏向物理、控制、工业制造等硬核力学/工程背景)",
+      "B题：离散建模题 (偏向图论、网络规划、离散运筹优化)",
+      "C题：数据处理与挖掘题 (偏向机器学习预测、分类、大数据挖掘，高度契合计算机/AI专业)"
+    ],
+    "timeline": "每年9月上旬（通常为周四晚上20点到周日晚上20点，共3天3夜72小时封闭式参赛，全程提交论文）。",
+    "website": "http://www.mcm.edu.cn/",
+    "note": "【保研 T2: 10/7/4分 核心加分】国内参与人数最多、保研加分极广的基础学科建模竞赛。3人一队，3天3夜72小时不间断高强度解题与写论文。\n1. 【黄金团队】：1人负责建立数学模型（模型手，需精通多元回归、运筹优化、马尔可夫链等数学理论），1人负责编程求解算法（编程手，偏向计算机专业，精通 Python/Matlab 进行数据清洗、求解器 Gurobi 调用、机器学习模型编写），1人负责论文撰写与精美排版（写作手，需精通 LaTeX 排版、精美数据图表绘制）；\n2. 【制胜法宝】：对于计算机专业，C题（大数据方向）是必选题。答题重点在于算法方案的创新性（如引入最新的深度学习预测）与论文排版的极度精美、严谨。3天3夜必须合理规划体力，前两天完成建模与代码，最后一天通宵打磨论文。"
+  },
+  "3006": {
+    "id": 3006,
+    "tracks": [
+      "电源类赛题 (如高功率因数电源、无线充电器、三相逆变器)",
+      "信号源与射频无线电类赛题 (如高频信号发生器、射频宽带放大器)",
+      "自动控制类赛题 (如自平衡智能车、无人机自主飞行器、多自由度机械手)",
+      "仪器仪表类赛题 (如微弱信号检测仪、数字示波器、电能质量分析仪)",
+      "芯片与嵌入式系统设计类赛题 (如FPGA高速信号采集系统、微控制器应用开发)",
+      "模拟电子电路类赛题 (如低频电子线路、集成运算放大器应用)"
+    ],
+    "timeline": "每单数年举办一次全国竞赛（8月中上旬，四天三夜84小时封闭式开发答题，现场真机测试）。每双数年由各省举办省级电子设计竞赛（通常在7-8月）。",
+    "website": "http://www.nuedc.com.cn/",
+    "note": "【保研 T2: 10/7/4分 核心加分】硬件与电子控制类最高权威赛事。3人一队，分工建议为：1人负责模拟与数字硬件电路设计（画板、焊接、调试电源与信号链），1人负责单片机/FPGA底层驱动开发与主控程序编写，1人负责核心控制算法调试或辅助硬件焊接。备赛重点：极其熟练地使用 Altium Designer 绘制双层/四层 PCB 板；精通单片机（STM32、MSP432）或 FPGA 开发；熟练使用示波器、万用表、信号源等测试仪器；提前准备好常用模块（主控板、电机驱动、AD/DA转换、运放模块）的库函数，现场快速组装调试。"
+  },
+  "3007": {
+    "id": 3007,
+    "tracks": [
+      "临床医学专业赛道 (含内科、外科、妇产科、儿科、急救医学等临床技能)",
+      "预防医学专业赛道 (含公共卫生调查、疫情流调分析、实验室毒物检测)",
+      "护理学专业赛道 (含基础护理技术、急危重症护理、临床思维综合评判)",
+      "中医学专业赛道 (含针灸推拿、中药辨识、中医内科诊疗实操)",
+      "医学检验技术专业赛道 (含临床生化检验、免疫学检验、微生物检验)"
+    ],
+    "timeline": "每年3月-4月举办各校内初赛选拔与培训，4月中局各分区赛，5月中旬举办全国总决赛。",
+    "website": "http://www.cmda.net/",
+    "note": "【专业备赛指南】医学教育领域规格最高、影响最广的顶级技能大赛。极度看重临床医学实践操作的规范性、临床思维决策能力以及医患沟通人文关怀。比赛采用多站式（OSCE 赛制）或赛道式进行实操考核。备赛建议：团队需由临床或相关专业优秀学生组建，重点针对无菌操作、心肺复苏（CPR）、气管插管、静脉穿刺、外科清创缝合等核心技能进行千万次的反复模拟磨炼，做到动作毫无瑕疵、流程绝对规范；同时深入学习执业医师考试大纲的临床思维，培养极强的心理素质和团队配合默契度。"
+  },
+  "3008": {
+    "id": 3008,
+    "tracks": [
+      "智能机械装置设计赛道 (如智能家用、老年人辅助、医疗康复机械)",
+      "现代农业与乡村振兴作业机械赛道 (如自动采摘机、智能种植/播种机械)",
+      "仿生机械与特种机器人创意赛道 (如仿生鱼、仿生多足爬行机构)",
+      "机械结构虚拟仿真与动力学分析赛道"
+    ],
+    "timeline": "每双数年举办一次全国竞赛（通常在前一年10月发布主题，当年3-5月省级预赛，7-8月全国总决赛答辩与实物演示）。",
+    "website": "http://www.umic.net.cn/",
+    "note": "【专业备赛指南】机械工程领域最具权威性的大学生竞赛。3-5人组队，极度看重机械结构的原创设计、实物样机的精细加工与真实功能的运转演示。备赛建议：团队需紧扣当年发布的主题进行头脑风暴，构思巧妙的连杆机构、凸轮机构、齿轮传动或气动/液压执行系统；使用 SolidWorks/Inventor 完成精准的 3D 三维装配建模与干涉分析；配合单片机（Arduino/STM32）及传感器实现智能闭环控制；必须制造出高水准的物理实物样机，并在答辩现场进行无故障的流畅演示，现场答辩 PPT 和展示视频需重点突出项目创新壁垒和结构亮点。"
+  },
+  "3009": {
+    "id": 3009,
+    "tracks": [
+      "木质/竹质 truss 桁架空间受力结构设计赛道",
+      "抗震高层框架钢结构虚拟抗拉抗剪分析赛道",
+      "现场实体结构模型手工制作赛道 (使用薄竹片、特制胶水)",
+      "实体结构模型物理多重载荷（如砂袋、挂重、静力/动力震动）物理加载测试"
+    ],
+    "timeline": "每年3-5月各省赛区发布赛题及尺寸限制，5-7月各省分区赛现场制作与加载，10-11月全国总决赛封闭式手工制作与抗压加载。",
+    "website": "http://www.jzsjjs.com/",
+    "note": "【专业备赛指南】土木工程领域含金量封顶的“奥林匹克”竞赛。3人一队，极其看重物理结构力学计算、极限承载力优化、结构抗震分析以及极致精细的手工制作工艺。备赛建议：团队需要精通材料力学、结构力学，通过 SAP2000/ANSYS 进行精细的受力模拟与配重计算，设计出“以最轻结构承受最大载荷”的极致构型；在备赛室进行千百次的真机木/竹模型制作练习，熟练掌握竹片弯曲、胶水粘结、节点强化的极致手艺，确保模型制作误差在毫米级内；物理加载现场心理素质必须极强，每一步配重都需要精准操作，保证模型在极限震动或静载下不发生局部失稳。"
+  },
+  "3010": {
+    "id": 3010,
+    "tracks": [
+      "平面类广告创意设计",
+      "视频类 (影视广告与微电影广告)",
+      "动画类/互动类广告设计",
+      "策划案类 (全案营销策划)",
+      "广播类/文案类创意"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3011": {
+    "id": 3011,
+    "tracks": [
+      "竞速组 (电磁组、摄像头组、信标组、摩托组、多旋翼组等)",
+      "综合组 (室外完全自主避障导航、智能视觉越野组等)",
+      "创意组 (大模型车载应用、机器人协同创意设计等)"
+    ],
+    "timeline": "每年4-6月车模制作与代码调试，7月分区省赛，8月全国总决赛现场对决",
+    "website": "http://www.smartcar.org.cn/",
+    "note": "多学科交叉的汽车智能控制比赛。涉及机械底盘、PCB硬件、经典控制算法（PID）以及机器视觉（图像处理）。需要在车模上进行长期物理调试。"
+  },
+  "3012": {
+    "id": 3012,
+    "tracks": [
+      "商业计划书 (BP) 编写与市场可行性分析",
+      "电子商务营销创意与商业落地",
+      "供应链物流网络规划与优化",
+      "企业运营沙盘模拟对抗",
+      "财会税务风险管理与大数据审计"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "http://www.nuedc.com.cn/",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3013": {
+    "id": 3013,
+    "tracks": [
+      "新能源“双创”智能车辆赛道 (如太阳能/温差发电势能小车、自主避障导航)",
+      "智能制造工程实践赛道 (如智能物料分拣与工业机械臂控制、智慧仓储)",
+      "虚拟仿真与数字孪生设计赛道 (如数字孪生车间、虚拟装配模拟)",
+      "生活垃圾智能分类与物联网车辆开发赛道"
+    ],
+    "timeline": "每双数年举办全国总决赛。当年3-5月省级选拔与线上初赛，6-7月全国半决赛答辩，10-11月全国总决赛现场对决。",
+    "website": "http://www.gcxcjxcx.sdu.edu.cn/",
+    "note": "【专业备赛指南】教育部官方主办、覆盖学科最广的现代工程制造与创新实践大赛。3-4人组队，偏向智能制造、新能源和新工科实践。备赛建议：注重多学科交叉。新能源小车组要深钻能量转化效率、轨道循迹控制算法（PID）以及超轻物理底盘搭建；智能制造组要精通工业自动化控制（PLC/机器人示教）、机器视觉图像识别与物料抓取；所有组别都需要提交极其规范的技术设计说明书和装配工艺文档，现场对突发工程故障的快速排查与抢修能力是夺冠的关键。"
+  },
+  "3014": {
+    "id": 3014,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3015": {
+    "id": 3015,
+    "tracks": [
+      "英语演讲大赛",
+      "英语辩论大赛",
+      "英语写作大赛",
+      "英语阅读大赛"
+    ],
+    "timeline": "每年3月-5月省赛选拔，10月-11月全国总决赛现场竞赛",
+    "website": "http://www.heep.unipus.cn/",
+    "note": "【专业备赛指南】这属于程序算法类的顶尖赛事。极度看重个人算法基础，重点考察常用数据结构（链表/二叉树/图）、动态规划、搜索算法、数论与贪心算法。建议长期在 LeetCode, Codeforces 等平台高强度刷题训练。"
+  },
+  "3016": {
+    "id": 3016,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3017": {
+    "id": 3017,
+    "tracks": [
+      "学术论文展示赛道 (基于大创项目发表的高水平学术论文展示与口头答辩)",
+      "改革成果展示赛道 (大创项目研发的硬核科技成果及实物样机展示)",
+      "创业邮路展示赛道 (已进入孵化阶段的大创创业项目路演)"
+    ],
+    "timeline": "每年3月-5月大创项目立项及升级（国创），7月各省推荐年会项目，10月-11月举办年会现场展示与问答。",
+    "website": "http://gjcxcy.bjtu.edu.cn/",
+    "note": "【保研 T2: 10/7/4分 核心加分】教育部极具权威性的本科生研究计划结题展示。只有评选为“国家级大创”的项目才有资格被推荐参加年会。\n1. 【备赛策略】：在本科低年级（大一、大二）时必须积极联系院内高水平教授立项“大创项目”；\n2. 【成果积累】：项目结项时必须有硬核成果支撑（如发表中文核心/EI/SCI论文、申请国家发明专利、或者开发出完整的软件系统著作权）；\n3. 【年会答辩】：年会的学术论文或实物展示非常看重“本科生独立自主的研究水平”。现场展位答辩时要对每一个技术细节了如指掌，逻辑清晰地陈述自己的研究创新点。"
+  },
+  "3018": {
+    "id": 3018,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3019": {
+    "id": 3019,
+    "tracks": [
+      "RoboMaster 机甲大师对抗赛 (含步兵、英雄、哨兵、空中机器人等，高度综合)",
+      "RoboMaster 机甲大师单项赛 (工程机器人、飞镖系统开发)",
+      "RoboCon 机器人学校竞技对抗赛 (根据每年特定主题进行机械结构与电控开发)"
+    ],
+    "timeline": "每年秋季发布新赛季规则并组建庞大战队，次年3月-5月分区赛现场比拼，8月全国总决赛现场对决。",
+    "website": "https://www.robomaster.com/",
+    "note": "【保研 T2: 10/7/4分 核心加分】全国瞩目、观赏性最强、规模最宏大的战队制机器人竞技大赛。包含极其硬核的机械结构、嵌入式电控与计算机视觉算法开发。\n1. 【计算机视觉组】：这是保研金牌的最强通道。需要独立开发“自动防守与自动瞄准系统”（自瞄算法）。核心技术包括：利用 OpenCV 进行基于高频光源检测的装甲板识别、利用卡尔曼滤波进行目标轨迹预测与提前量计算、使用激光雷达进行高精度的三维空间 SLAM 导航定位；\n2. 【嵌入式电控组】：要求精通 C/C++，在 STM32 芯片上编写底盘控制代码，熟练配置 CAN 总线协议、串级 PID 算法，调节无刷电机的极致运动曲线。"
+  },
+  "3020": {
+    "id": 3020,
+    "tracks": [
+      "本科生组市场调查与分析报告",
+      "研究生组大数据分析与调查策划",
+      "实践赛路演与PPT答辩"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3021": {
+    "id": 3021,
+    "tracks": [
+      "机械类三维 CAD 产品正向造型建模与二维工程图绘制",
+      "建筑类 BIM 数字化建模与建筑空间三维设计",
+      "道桥/水利类空间三维建模与地形渲染三维图",
+      "轻量化结构优化设计与 3D 打印技术实操赛道"
+    ],
+    "timeline": "每年3-4月校内选拔，5月各省级成图大赛，7月中旬举办全国总决赛（均采用机考高强度闭卷制，现场限时出图）。",
+    "website": "http://www.caet.org.cn/",
+    "note": "【专业备赛指南】图学界被誉为“工科最高荣誉”的先进成图与数字建模大赛。个人参赛与团队总分对抗。备赛重点：必须达到三维建模软件（如 SolidWorks, Creo, Inventor, AutoCAD, Revit）炉火纯青的“盲打”手速。需要高强度刷爆历年真题，限时完成极度复杂的机械零件测绘、大型装配体约束与爆炸图制作、符合国标的工程图投影绘制（含公差与配合标注）；掌握结构拓扑优化和 3D 打印原理。备赛期间需进行每日数小时的高强度限时画图拉练。"
+  },
+  "3022": {
+    "id": 3022,
+    "tracks": [
+      "数字工业设计与智能制造赛道 (含现代装备、消费电子 3D 造型)",
+      "数字人文学科与创意游戏动漫 3D 场景开发",
+      "数字建筑 BIM 规划设计与智慧城市三维孪生",
+      "元宇宙数字孪生与 VR/AR 虚拟交互产品展示"
+    ],
+    "timeline": "每年3月-6月线上作品初选与校赛，7月-9月各省赛区网络初评与答辩，11-12月全国总决赛现场现场答辩。",
+    "website": "http://3ddl.3dportal.cn/",
+    "note": "【专业备赛指南】全国覆盖面最广的三维数字化、虚拟现实与元宇宙创新设计大赛。3-5人组队。备赛要点：追求极致的三维视觉渲染与功能完整度。工业组注重机械外观的美学质感、传动装配的可行性与轻量化拓扑设计；数媒创意组注重 3D 场景建模精细度、游戏引擎交互（Unity3D/UE5）的流畅度；必须准备精美的 3D 动画渲染视频和交互式演示可执行程序（.exe），答辩 PPT 需着重体现技术先进性和三维数字化的应用前景。"
+  },
+  "3023": {
+    "id": 3023,
+    "tracks": [
+      "智能制造工程设计与应用类：逻辑控制赛道 (PLC 底层逻辑与工业控制)",
+      "智能制造工程设计与应用类：运动控制赛道 (电机驱动精度调优)",
+      "智能制造工程设计与应用类：过程控制赛道 (工业化工流程自动配置)",
+      "工业互联网与智能生产赛道 (基于大模型的工业物联网数据分析与数字孪生)"
+    ],
+    "timeline": "每年3月-5月网上报名与初评设计案，7月省级赛区现场初赛，8月中旬全国总决赛现场联调答辩。",
+    "website": "http://www.mimic.org.cn/",
+    "note": "【保研 T2: 10/7/4分 核心加分】工业自动化与智能制造控制领域的国家级顶级学科竞赛。非常适合偏向硬件电控、PLC 与工业互联网大数据的计算机学生参赛。\n1. 【核心备赛】：逻辑控制和运动控制是计算机同学大显身手的赛道。要求精通西门子 PLC 编程语言（如梯形图、ST结构化文本），熟练掌握工业 HMI 触摸屏界面设计、Profibus/Profinet 工业总线通信协议配置；\n2. 【避坑要点】：现场硬件接线与真机调试极易发生短路或信号干扰。备赛阶段必须在实验室高强度练习标准接线工艺、设计完善的故障容错保护逻辑；工业互联网赛道需要额外掌握常用的工控大数据预测模型。"
+  },
+  "3024": {
+    "id": 3024,
+    "tracks": [
+      "A类：企业命题类 (由大厂如百度、阿里、华为发布真实工业级技术痛点，偏算法/研发)",
+      "B类：创业实践类 (自由创新创业项目展示，侧重技术创新性与商业闭环可行性)"
+    ],
+    "timeline": "每年11月-次年3月企业命题发布与技术攻关研发，4月-5月省级初评与大区赛，8月全国总决赛答辩。",
+    "website": "http://www.fwwb.org.cn/",
+    "note": "【保研 T2: 10/7/4分 核心加分】紧贴企业真实应用场景、极具工程含金量的全国顶级学科比赛。A类（企业命题）是展现硬核计算机系统工程能力的最强舞台。\n1. 【企业命题A类选择】：由企业提供脱敏的工业数据或真实应用接口（如企业级知识图谱问答系统、超大规模短视频算法推荐引擎）。需要精通微服务架构设计、高并发数据库访问性能调优、以及高水准的 AI 算法模型优化；\n2. 【交付成果】：必须产出符合企业工业级交付标准的软硬件系统，包含完整代码库、部署配置手册、核心算法模型权重以及长达百页的系统架构技术文档。"
+  },
+  "3025": {
+    "id": 3025,
+    "tracks": [
+      "软件应用与开发赛道 (Web网站、移动App客户端、高水平桌面软件系统开发)",
+      "人工智能应用赛道 (含算法创新组、场景挑战组、大模型人工智能创意组)",
+      "信息安全与网络挑战赛道",
+      "数字媒体设计组 (含动漫游戏、VR/AR 虚拟交互多媒体)",
+      "微课与教学辅助作品赛道"
+    ],
+    "timeline": "每年3-4月校级竞赛选拔，5月省级赛区盲审评审与答辩推荐，7-8月举办全国各大区总决赛答辩。",
+    "website": "http://jsjds.blcu.edu.cn/",
+    "note": "【保研 T2: 10/7/4分 核心加分】计算机专业覆盖面最广、参与度最高、极其适合大二大三拿国奖的黄金赛事。重点看重作品的实用创新性与工程完成度。\n1. 【人工智能应用赛道】：这是保研抢金的大热赛道。建议携带团队的学术科研项目（如基于深度学习的病灶识别、文生图大模型微调应用）包装后参赛；\n2. 【软件应用赛道】：极度注重系统完整性。必须开发出可实际运行的高保真 Web/App 系统（前端 UI 精美，后端架构清晰，使用 Spring Boot/Django，数据库用 MySQL/Redis），并准备精美的 3-5 分钟视频演示和详尽的软件架构说明文档，决赛现场答辩要体现扎实的软件工程规范。"
+  },
+  "3026": {
+    "id": 3026,
+    "tracks": [
+      "团体程序设计天梯赛 (算法排位：基础编程能力的大规模团队对抗)",
+      "人工智能创意赛 (AI大模型与深度学习在特定行业垂直领域的创新创意)",
+      "微信小程序应用开发大赛 (快速移动开发与用户体验创意设计)",
+      "移动应用创新赛 (基于 iOS/Apple 核心技术生态的创意开发)",
+      "网络技术挑战赛 (局域网配置、高水平网络安全设计作品)"
+    ],
+    "timeline": "天梯赛在每年4月中旬；小程序与移动创新赛在4-8月；人工智能创意赛在5-9月。",
+    "website": "http://www.c4och.com/",
+    "note": "【保研 T2: 10/7/4分 核心加分】由教育部教指委和各大顶级IT公司联合创办的超级大赛联盟。涵盖了算法、前端、移动端和AI，是夺金率极高的赛事群。\n1. 【团体程序设计天梯赛】：10人组队，个人闭卷作答累计总分。需要团队成员人均具备极强的手速和扎实算法底蕴（刷穿 LeetCode 300+ 题）；\n2. 【人工智能创意赛】：各大大厂提供强大云超算支持。要求结合实际垂直领域进行神经网络建模创新（如智慧手语翻译仪、大模型心理评估机器人），极看重模型评估指标与商业落地情景。"
+  },
+  "3027": {
+    "id": 3027,
+    "tracks": [
+      "软件类：C/C++程序设计 (大学A组 - 985/211高水平组，大学B组)",
+      "软件类：Java软件开发 (大学A组，大学B组)",
+      "软件类：Python程序设计 (大学A组，大学B组)",
+      "电子类：单片机设计与开发 (单片机汇编/C语言控制调试)",
+      "电子类：嵌入式设计与开发 (STM32 底层控制开发)"
+    ],
+    "timeline": "每年10月-次年3月报名，4月各省线下省赛，5-6月全国总决赛。",
+    "website": "http://www.lanqiao.cn/",
+    "note": "【保研 T3: 5/4/3分 重要加分】国内规模最大、参与人数最多、最受大一大二学生热捧的基础级编程大赛。省赛一等奖（前10%左右）可以直接晋级国赛。\n1. 【真题大法】：算法赛题难度低于 ACM/CCPC，多为填空题与大模拟题。核心备赛秘诀只有四个字：“刷爆真题”。建议在蓝桥杯官方刷题平台或蓝桥 OJ 将近 10 年的所有省赛、国赛真题通刷三遍；\n2. 【软件备赛点】：要极其熟练地运用 C++ STL 常用容器（vector/map/set/queue/stack）与库函数（sort/next_permutation）；\n3. 【电子类备赛】：必须将单片机/嵌入式主板的各种外设（LED、按键、数码管、ADC、EEPROM、I2C）底层驱动模板练到“盲打背诵”的熟练度，现场才能留出充裕时间做上层控制逻辑。"
+  },
+  "3028": {
+    "id": 3028,
+    "tracks": [
+      "视觉传达设计组",
+      "产品设计与工艺设计组",
+      "环境空间规划与景观设计组",
+      "数字媒体与游戏动画组",
+      "学术论文与设计教育论坛"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3029": {
+    "id": 3029,
+    "tracks": [
+      "地质标本鉴定与显微镜观察",
+      "地质图件绘制与GIS空间数据分析",
+      "野外地质工程勘测模拟与口头辩护"
+    ],
+    "timeline": "每年3月-5月实验大纲设计与初评，7月-8月全国总决赛线下实验实操答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于科研实验与理学操作类的顶尖赛事。考察精湛的实验室物理实操本领、科学逻辑严谨度与科研论文答辩。需要长期在专业实验室进行样本测试，确保实验极佳的重现性与数据准确度。"
+  },
+  "3030": {
+    "id": 3030,
+    "tracks": [
+      "光电迷宫智能小车避障追踪赛",
+      "光电传感器与光学透镜系统精密设计",
+      "虚拟仿真光学系统开发"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3031": {
+    "id": 3031,
+    "tracks": [
+      "集成电路设计与软硬件 system 开发",
+      "微电子器件与制造工艺仿真",
+      "测试与应用芯片开发",
+      "芯片架构设计与EDA算法优化"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "3032": {
+    "id": 3032,
+    "tracks": [
+      "工业级纯铁金相样本研磨与制备",
+      "中碳钢金相抛光及表面镜面检查",
+      "奥氏体金相金相组织显微镜观察与评判"
+    ],
+    "timeline": "每年3月-5月实验大纲设计与初评，7月-8月全国总决赛线下实验实操答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于科研实验与理学操作类的顶尖赛事。考察精湛的实验室物理实操本领、科学逻辑严谨度与科研论文答辩。需要长期在专业实验室进行样本测试，确保实验极佳的重现性与数据准确度。"
+  },
+  "3033": {
+    "id": 3033,
+    "tracks": [
+      "创新实践能力赛 (网络攻防实战：CTF 夺旗 + AWD 攻防对抗)",
+      "软件安全设计赛 (信息安全作品研发、系统安全加固与防御设计)"
+    ],
+    "timeline": "每年4-6月线上报名及初赛选拔，7-8月全国总决赛现场激烈对抗",
+    "website": "http://www.ciscn.cn/",
+    "note": "国内网络安全界规格最高、最顶级的官方权威赛事。攻防赛极考验Web渗透、逆向破解、漏洞利用（Pwn）和系统加固水平；作品赛看重安全加密与防御算法研发。"
+  },
+  "3034": {
+    "id": 3034,
+    "tracks": [
+      "视觉传达设计组",
+      "数字影像与短视频创意组",
+      "交互UI/UX与体验设计组",
+      "环境空间与可持续设计组",
+      "潮玩与智能硬件创意组"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3035": {
+    "id": 3035,
+    "tracks": [
+      "理论力学个人挑战组",
+      "材料力学专业计算组",
+      "力学实验模拟与受力分析",
+      "结构承载能力团体设计与答辩"
+    ],
+    "timeline": "每双数年举办，当年5月下旬进行全国个人赛（闭卷笔试），7月-8月举办团体赛与实验设计",
+    "website": "http://zpy.cstam.org.cn/",
+    "note": "全国周培源大学生力学竞赛。土木机械力学类的顶级学科竞赛。深度考察理论力学与材料力学的基本功，题目计算难度极大。建议刷爆历年真题及周培源力学竞赛辅导书。"
+  },
+  "3036": {
+    "id": 3036,
+    "tracks": [
+      "三维 CAD 正向建模与工程图绘制",
+      "物理实体结构受力加载极限压强测试",
+      "工程BIM管线综合与全生命周期模拟",
+      "智能工程制造硬件实体研制与拼装"
+    ],
+    "timeline": "每年3月-5月设计方案报送，6月结构物理加载/机械联调，8月国赛对决",
+    "website": "",
+    "note": "【专业备赛指南】这属于土木机械工程类的顶尖赛事。高度考验工程物理计算、三维建模精度以及模型实体加工工艺的完美度。结构设计和机械设计必须精准控制在物理尺寸限制内，并在现场受压测试中表现出极佳的稳定性。"
+  },
+  "3037": {
+    "id": 3037,
+    "tracks": [
+      "RoboCup 机器人足球组 (含中型组、仿真组、人形组，自主机器视觉与控制算法)",
+      "智能制造与工业机器人挑战组 (智慧工厂分拣、PLC自动化控制)",
+      "机器人救援与野外勘测组 (自主避障寻线、SLAM三维建图)",
+      "农业机器人与医疗机器人应用组"
+    ],
+    "timeline": "每年3月-5月项目方案研发，6月分区赛选拔，8月-9月全国总决赛现场对抗。",
+    "website": "http://www.rccsoa.org/",
+    "note": "【保研 T2: 10/7/4分 核心加分】教育部官方目录中机器人领域的最高级别学术赛事。极度考察机器视觉（OpenCV）、自动控制（PID/模糊控制）与物理硬件系统的深度融合。\n1. 【技术备赛】：足球仿真组和机器人足球中型组是计算机及人工智能专业的绝对核心舞台。需要熟练掌握 ROS 机器人操作系统、自主避障与路径规划算法（A*/Dijkstra）、深钻基于深度学习的目标检测（如 YOLO）来快速识别足球与障碍物；\n2. 【调试绝窍】：软硬件的契合度至关重要。需要在实验室建立 1:1 的物理模拟场地，进行成百上千次的真机动作微调，保证传感器数据传输低延迟与电机响应高精度。"
+  },
+  "3038": {
+    "id": 3038,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "http://jsjds.blcu.edu.cn/",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3039": {
+    "id": 3039,
+    "tracks": [
+      "高教主赛道 (含研究生创意组、初创组、成长组等)",
+      "“青年红色筑梦之旅”赛道 (偏公益/乡村振兴)",
+      "产业命题赛道 (企业出技术命题，学生提供解决方案)",
+      "职教赛道 / 创客硬件创意原型设计"
+    ],
+    "timeline": "每年4月-6月校赛选拔与重点项目深度打磨，7月-8月省赛，10月全国决赛金奖争夺",
+    "website": "",
+    "note": "【专业备赛指南】这属于双创综合孵化类的顶尖赛事。全国含金量封顶的“双创”盛会。高度考察项目的核心科技含量、商业化落地前景、已取得的订单/投资额以及答辩路演的现场感染力。必须精心打磨精美的路演 PPT 和短视频。"
+  },
+  "3040": {
+    "id": 3040,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "http://www.craic.org.cn/",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "3041": {
+    "id": 3041,
+    "tracks": [
+      "5G 移动通信技术工程实践赛",
+      "信息通信技术创新创意赛",
+      "5G+大模型行业应用专场"
+    ],
+    "timeline": "每年3月-4月省赛，5月-6月全国总决赛答辩与真机模拟联调",
+    "website": "http://www.dtcup.cn/",
+    "note": "“大唐杯”全国大学生新一代信息通信技术大赛。信息通信工程领域的顶级赛事。高度看重 5G 基站协议、无线网规网优、射频技术、以及大唐真机仿真系统的配置操作。建议结合 5G 通信课程进行系统性实验备赛。"
+  },
+  "3042": {
+    "id": 3042,
+    "tracks": [
+      "网络赛道 (Datacom/Security/WLAN 路由交换)",
+      "云赛道 (Cloud/Big Data/Storage/AI)",
+      "计算赛道 (openEuler/openGauss 系统与数据库)",
+      "创新赛 (大模型行业应用开发)"
+    ],
+    "timeline": "每年10月-12月报名与省赛选拔，次年3月全国决赛，5月全球总决赛",
+    "website": "https://e.huawei.com/cn/talent/ict-academy",
+    "note": "华为 ICT 大赛。华为官方主办的 ICT 精英挑战赛。理论考试加实验实操（如配置华为交换机防火墙、部署 AI 云模型）。建议在华为人才联盟平台完成相关 HCIA/HCIP 课程学习并取得证书。"
+  },
+  "3043": {
+    "id": 3043,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "http://www.nuedc.com.cn/",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "3044": {
+    "id": 3044,
+    "tracks": [
+      "科学探究类 (含实验科学与自然调查报告)",
+      "创新创业类 (生物技术商业落地及BP路演)"
+    ],
+    "timeline": "每年3月-5月实验大纲设计与初评，7月-8月全国总决赛线下实验实操答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于科研实验与理学操作类的顶尖赛事。考察精湛的实验室物理实操本领、科学逻辑严谨度与科研论文答辩。需要长期在专业实验室进行样本测试，确保实验极佳的重现性与数据准确度。"
+  },
+  "3045": {
+    "id": 3045,
+    "tracks": [
+      "命题物理实验设计与测试组",
+      "自选物理实验与教学仪器开发组",
+      "物理实验学术论文发表与展示"
+    ],
+    "timeline": "每年3月-5月实验大纲设计与初评，7月-8月全国总决赛线下实验实操答辩",
+    "website": "http://www.nuedc.com.cn/",
+    "note": "【专业备赛指南】这属于科研实验与理学操作类的顶尖赛事。考察精湛的实验室物理实操本领、科学逻辑严谨度与科研论文答辩。需要长期在专业实验室进行样本测试，确保实验极佳的重现性与数据准确度。"
+  },
+  "3046": {
+    "id": 3046,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3047": {
+    "id": 3047,
+    "tracks": [
+      "商业计划书 (BP) 编写与市场可行性分析",
+      "电子商务营销创意与商业落地",
+      "供应链物流网络规划与优化",
+      "企业运营沙盘模拟对抗",
+      "财会税务风险管理与大数据审计"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3048": {
+    "id": 3048,
+    "tracks": [
+      "商业计划书 (BP) 编写与市场可行性分析",
+      "电子商务营销创意与商业落地",
+      "供应链物流网络规划与优化",
+      "企业运营沙盘模拟对抗",
+      "财会税务风险管理与大数据审计"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3049": {
+    "id": 3049,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "http://www.craic.org.cn/",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "3050": {
+    "id": 3050,
+    "tracks": [
+      "视觉传达组",
+      "数媒动漫与虚拟现实(VR)组",
+      "空间艺术设计组",
+      "工业产品与工艺美术组",
+      "AI大模型文生图创意专题"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3051": {
+    "id": 3051,
+    "tracks": [
+      "创新类 (机器人创新设计、人工智能创新设计与大模型算法应用)",
+      "竞技类 (微型无人机竞技、人形机器人障碍越野、四足机器人竞速)",
+      "应用类 (智能汽车、智慧农业、智慧家庭、工业智能制造)"
+    ],
+    "timeline": "每年3月-5月报名，6月-7月各省选拔赛与省赛，8-9月全国总决赛",
+    "website": "http://www.craic.org.cn/",
+    "note": "历史悠久的官方机器人与人工智能学科竞赛。极偏向AI智能算法与机器人控制的核心结合，国奖比例相对友好，是人工智能专业学生的极佳历练场。"
+  },
+  "3052": {
+    "id": 3052,
+    "tracks": [
+      "节能减排科技作品设计 (物理硬件研发)",
+      "节能减排社会调查报告 (文科/社会学分析组)",
+      "水处理与清洁能源专项组"
+    ],
+    "timeline": "每年3-5月项目征集，6月专家初审，8月现场作品展示与评委打分答辩",
+    "website": "http://www.jienengjianpai.org/",
+    "note": "全国大学生节能减排社会实践与科技竞赛。多学科交叉的环境与能源顶级赛事。注重“节能减排”主题的原创物理模型或社会调查报告。极看重真机 Demo 的展示与低碳经济数据的测算支撑。"
+  },
+  "3053": {
+    "id": 3053,
+    "tracks": [
+      "英语即兴演讲与命题表达赛道",
+      "英国/美国议会制辩论对抗 (BP制)",
+      "中英高级翻译与同声传译赛道",
+      "跨文化情境模拟演绎与专家Q&A答辩",
+      "中华经典古籍诵读与手写书法组"
+    ],
+    "timeline": "每年4月-6月校内选拔及线上初赛，9月-10月省级复赛，11月/12月全国总决赛",
+    "website": "http://www.heep.unipus.cn/",
+    "note": "【专业备赛指南】这属于语言人文学科类的顶尖赛事。极度侧重口语表达风采、快速思辨力、跨文化沟通敏锐度以及广博的人文知识底蕴。演讲与辩论赛极考验现场临危不乱的强大气场。"
+  },
+  "3054": {
+    "id": 3054,
+    "tracks": [
+      "创新创意挑战赛 (智能硬件、物联网、大模型应用、边缘计算创意)",
+      "创业挑战赛 (具有商业化落地前景的初创项目)",
+      "专项挑战赛 (如车联网、芯片设计、人形机器人专项)"
+    ],
+    "timeline": "每年4-7月网上提交创意视频与说明书，8-10月省赛，11-12月全国总决赛路演",
+    "website": "http://www.g-ican.com/",
+    "note": "强调智能硬件与AI大模型结合的硬科技创新赛事。极看重答辩PPT路演、展示Demo视频和项目完整性，适合喜欢动手做物理软硬件原型的同学。"
+  },
+  "3055": {
+    "id": 3055,
+    "tracks": [
+      "商业计划书 (BP) 编写与市场可行性分析",
+      "电子商务营销创意与商业落地",
+      "供应链物流网络规划与优化",
+      "企业运营沙盘模拟对抗",
+      "财会税务风险管理与大数据审计"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3056": {
+    "id": 3056,
+    "tracks": [
+      "英语即兴演讲与命题表达赛道",
+      "英国/美国议会制辩论对抗 (BP制)",
+      "中英高级翻译与同声传译赛道",
+      "跨文化情境模拟演绎与专家Q&A答辩",
+      "中华经典古籍诵读与手写书法组"
+    ],
+    "timeline": "每年4月-6月校内选拔及线上初赛，9月-10月省级复赛，11月/12月全国总决赛",
+    "website": "",
+    "note": "【专业备赛指南】这属于语言人文学科类的顶尖赛事。极度侧重口语表达风采、快速思辨力、跨文化沟通敏锐度以及广博的人文知识底蕴。演讲与辩论赛极考验现场临危不乱的强大气场。"
+  },
+  "3057": {
+    "id": 3057,
+    "tracks": [
+      "英语即兴演讲与命题表达赛道",
+      "英国/美国议会制辩论对抗 (BP制)",
+      "中英高级翻译与同声传译赛道",
+      "跨文化情境模拟演绎与专家Q&A答辩",
+      "中华经典古籍诵读与手写书法组"
+    ],
+    "timeline": "每年4月-6月校内选拔及线上初赛，9月-10月省级复赛，11月/12月全国总决赛",
+    "website": "",
+    "note": "【专业备赛指南】这属于语言人文学科类的顶尖赛事。极度侧重口语表达风采、快速思辨力、跨文化沟通敏锐度以及广博的人文知识底蕴。演讲与辩论赛极考验现场临危不乱的强大气场。"
+  },
+  "3058": {
+    "id": 3058,
+    "tracks": [
+      "初赛 (三场线上算法排位赛，任选参加)",
+      "复赛 (线上百强排位争夺赛)",
+      "全国总决赛 (北京百度总部现场挑战赛)"
+    ],
+    "timeline": "每年6月-8月报名与初赛，9月复赛，10月/11月北京现场总决赛",
+    "website": "https://star.baidu.com/",
+    "note": "百度主办的顶级算法编程赛，有“IT奥斯卡”之称。题目全部为高难度算法编程，全国排名前列可获得百度技术专家直接面试绿卡，是程序员证明算法实力的殿堂。"
+  },
+  "3059": {
+    "id": 3059,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3060": {
+    "id": 3060,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3061": {
+    "id": 3061,
+    "tracks": [
+      "化工流程 Aspen 软件工艺仿真与设计",
+      "生命科学/基础医学前沿实验探索与报告",
+      "金属样品研磨抛光及微观金相分析",
+      "大学物理创新性实验仪器的开发与调试"
+    ],
+    "timeline": "每年3月-5月实验大纲设计与初评，7月-8月全国总决赛线下实验实操答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于科研实验与理学操作类的顶尖赛事。考察精湛的实验室物理实操本领、科学逻辑严谨度与科研论文答辩。需要长期在专业实验室进行样本测试，确保实验极佳的重现性与数据准确度。"
+  },
+  "3062": {
+    "id": 3062,
+    "tracks": [
+      "新创实验设计赛道",
+      "已有实验改进赛道",
+      "科普视频与化学创意赛道"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3063": {
+    "id": 3063,
+    "tracks": [
+      "CPU 设计挑战赛 (基于龙芯/RISC-V/MIPS 自主架构)",
+      "操作系统内核挑战赛 (编写自主 OS Kernel)",
+      "编译器设计与优化挑战赛 (编写 C 语言编译器)"
+    ],
+    "timeline": "每年3月-5月系统构建，6月-7月线上自动化评测跑分，8月现场总决赛答辩与跑分对决",
+    "website": "http://compiler.compiler-china.org/",
+    "note": "全国大学生计算机系统能力大赛。全国含金量最硬、门槛最高、被誉为“一生一芯”的底层芯片与系统软件挑战赛。需要手写 CPU、编译器或 OS 内核。建议精通 Verilog/C/汇编、硬件描述语言以及体系结构核心知识。"
+  },
+  "3064": {
+    "id": 3064,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3065": {
+    "id": 3065,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "3066": {
+    "id": 3066,
+    "tracks": [
+      "CTF 线上夺旗挑战赛 (Web/Reverse/Pwn/Crypto/Misc)",
+      "AWD 线下实时攻防对抗赛 (Attack with Defence)",
+      "网络安全应急响应与系统加固",
+      "信息安全作品设计与开发"
+    ],
+    "timeline": "每年4月-5月线上初赛，6月-7月线下全国决赛攻防对抗",
+    "website": "",
+    "note": "【专业备赛指南】这属于信息安全攻防类的顶尖赛事。国家级网络安全技术对抗。需要极高水平的代码分析、逆向破解、漏洞发掘与漏洞修补能力。建议利用 CTFHub, Bugku 长期训练，紧跟最新的 CVE 漏洞发布。"
+  },
+  "3067": {
+    "id": 3067,
+    "tracks": [
+      "测绘技能实操与仪器测量",
+      "GIS空间数据分析与三维建模",
+      "测绘科学论文与创新软件设计"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "3068": {
+    "id": 3068,
+    "tracks": [
+      "统计建模学术研究报告",
+      "大数据分析建模与Python工程算法",
+      "数据可视化展示与专家问答"
+    ],
+    "timeline": "每年1月美赛，每年9月国赛（均为连续3-4天封闭开发），其余比赛分布在4-5月",
+    "website": "http://www.mcm.edu.cn/",
+    "note": "【专业备赛指南】这属于数学建模数据分析类的顶尖赛事。建模求解、编程求解、英文/中文论文撰写三位一体。极度考察团队配合。建议编程手精通 Python/Matlab 常用数学库（numpy/pandas/scikit-learn），使用 LaTeX 精美排版论文。"
+  },
+  "3069": {
+    "id": 3069,
+    "tracks": [
+      "能源经济与碳中和学术论文组",
+      "能源金融与碳交易市场分析",
+      "绿色低碳发展社会调查报告"
+    ],
+    "timeline": "每年10月-次年3月论文提交，4月省赛初评，5月全国总决赛报告与答辩",
+    "website": "http://www.energyecon.cn/",
+    "note": "全国大学生能源经济学术创意大赛。国家级能源与低碳经济顶级学术赛事。极看重计量经济学模型、碳中和政策前沿分析以及实证数据支撑。建议团队中包含经济统计和能源环境跨学科人才。"
+  },
+  "3070": {
+    "id": 3070,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3071": {
+    "id": 3071,
+    "tracks": [
+      "视觉传达设计组 (海报/UI/画册)",
+      "三维数字建模与产品艺术设计",
+      "影视特效动画与短视频创意",
+      "VR/AR 交互式虚拟现实开发",
+      "数字媒体技术应用大作业演示"
+    ],
+    "timeline": "每年3月-5月作品征集及上传，6月省赛作品盲审，8月全国决赛路演答辩",
+    "website": "",
+    "note": "【专业备赛指南】这属于数字多媒体艺术类的顶尖赛事。创意设计与新媒体技术的完美融合。注重画风精美度、功能完成度以及人机交互体验的流畅感。必须提供高质量的高保真视频演示或可运行的 Demo 系统。"
+  },
+  "3072": {
+    "id": 3072,
+    "tracks": [
+      "商业计划书 (BP) 编写与市场可行性分析",
+      "电子商务营销创意与商业落地",
+      "供应链物流网络规划与优化",
+      "企业运营沙盘模拟对抗",
+      "财会税务风险管理与大数据审计"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3073": {
+    "id": 3073,
+    "tracks": [
+      "企业运营决策沙盘模拟对抗",
+      "数字化战略管理与商业博弈模拟"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3074": {
+    "id": 3074,
+    "tracks": [
+      "企业运营决策沙盘模拟对抗",
+      "数字化战略管理与商业博弈模拟"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "https://cy.ncss.cn/",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "3075": {
+    "id": 3075,
+    "tracks": [
+      "三维 CAD 正向建模与工程图绘制",
+      "物理实体结构受力加载极限压强测试",
+      "工程BIM管线综合与全生命周期模拟",
+      "智能工程制造硬件实体研制与拼装"
+    ],
+    "timeline": "每年3月-5月设计方案报送，6月结构物理加载/机械联调，8月国赛对决",
+    "website": "",
+    "note": "【专业备赛指南】这属于土木机械工程类的顶尖赛事。高度考验工程物理计算、三维建模精度以及模型实体加工工艺的完美度。结构设计和机械设计必须精准控制在物理尺寸限制内，并在现场受压测试中表现出极佳的稳定性。"
+  },
+  "3076": {
+    "id": 3076,
+    "tracks": [
+      "高水平算法解题主赛道",
+      "软件开发实践组",
+      "团体对抗排位赛",
+      "高校精英邀请赛"
+    ],
+    "timeline": "每年3月-5月省赛选拔，10月-11月全国总决赛现场竞赛",
+    "website": "",
+    "note": "【专业备赛指南】这属于程序算法类的顶尖赛事。极度看重个人算法基础，重点考察常用数据结构（链表/二叉树/图）、动态规划、搜索算法、数论与贪心算法。建议长期在 LeetCode, Codeforces 等平台高强度刷题训练。"
+  },
+  "3077": {
+    "id": 3077,
+    "tracks": [
+      "智能农业机器人与收获机械装备",
+      "无人机植保与田间环境智能监测",
+      "设施农业自动灌溉与温室智慧控制"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "3078": {
+    "id": 3078,
+    "tracks": [
+      "智能财务运营与核算模拟",
+      "大数据审计与财务数据分析",
+      "企业财务共享服务中心操作"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "4001": {
+    "id": 4001,
+    "tracks": [
+      "高水平算法解题主赛道",
+      "软件开发实践组",
+      "团体对抗排位赛",
+      "高校精英邀请赛"
+    ],
+    "timeline": "每年3月-5月省赛选拔，10月-11月全国总决赛现场竞赛",
+    "website": "http://www.heep.unipus.cn/",
+    "note": "【专业备赛指南】这属于程序算法类的顶尖赛事。极度看重个人算法基础，重点考察常用数据结构（链表/二叉树/图）、动态规划、搜索算法、数论与贪心算法。建议长期在 LeetCode, Codeforces 等平台高强度刷题训练。"
+  },
+  "4002": {
+    "id": 4002,
+    "tracks": [
+      "英语即兴演讲与命题表达赛道",
+      "英国/美国议会制辩论对抗 (BP制)",
+      "中英高级翻译与同声传译赛道",
+      "跨文化情境模拟演绎与专家Q&A答辩",
+      "中华经典古籍诵读与手写书法组"
+    ],
+    "timeline": "每年4月-6月校内选拔及线上初赛，9月-10月省级复赛，11月/12月全国总决赛",
+    "website": "http://www.heep.unipus.cn/",
+    "note": "【专业备赛指南】这属于语言人文学科类的顶尖赛事。极度侧重口语表达风采、快速思辨力、跨文化沟通敏锐度以及广博的人文知识底蕴。演讲与辩论赛极考验现场临危不乱的强大气场。"
+  },
+  "4003": {
+    "id": 4003,
+    "tracks": [
+      "Office 高级应用组 (Word/Excel/PPT 商务排版)",
+      "计算机编程技能组 (Python/Java/C++ 编程实操)",
+      "大数据与人工智能技能应用组"
+    ],
+    "timeline": "每年11月-次年4月线上报名与答题，5月全国赛在线实操与成绩评定",
+    "website": "http://www.compcontest.com/",
+    "note": "全国大学生计算机技能应用大赛。计算机基础与实用编程工具比赛。注重企业级 Office 排版与 Python 数据分析实操。建议熟练掌握常用办公快捷操作与库函数使用。"
+  },
+  "4004": {
+    "id": 4004,
+    "tracks": [
+      "MCM 连续数学建模组",
+      "MCM 离散数学建模组",
+      "ICM 大数据与分类预测组",
+      "ICM 网络运筹学分析组",
+      "环境政策与可持续性分析组"
+    ],
+    "timeline": "每年1月美赛，每年9月国赛（均为连续3-4天封闭开发），其余比赛分布在4-5月",
+    "website": "",
+    "note": "【专业备赛指南】这属于数学建模数据分析类的顶尖赛事。建模求解、编程求解、英文/中文论文撰写三位一体。极度考察团队配合。建议编程手精通 Python/Matlab 常用数学库（numpy/pandas/scikit-learn），使用 LaTeX 精美排版论文。"
+  },
+  "4005": {
+    "id": 4005,
+    "tracks": [
+      "MCM A题 (连续建模 - 偏物理/控制/数学分析)",
+      "MCM B题 (离散建模 - 偏图论/规划/网络科学)",
+      "MCM C题 (数据处理建模 - 偏大数据、分类、预测、AI)",
+      "ICM D题 (运筹学与网络科学分析)",
+      "ICM E题 (环境科学与可持续发展分析)",
+      "ICM F题 (政策研究与国际冲突治理分析)"
+    ],
+    "timeline": "每年1月下旬或2月上旬举办（通常为北京时间周五早晨至下周二早晨，连续4天96小时不中断）",
+    "website": "http://www.comap.com/",
+    "note": "国际上最具影响力的数学建模竞赛。3人一队，全程提交英文论文。C题（数据方向）和D题（运筹网络）高度契合AI算法，对出国深造和保研加分极大。"
+  },
+  "4006": {
+    "id": 4006,
+    "tracks": [
+      "高水平算法解题主赛道",
+      "软件开发实践组",
+      "团体对抗排位赛",
+      "高校精英邀请赛"
+    ],
+    "timeline": "每年3月-5月省赛选拔，10月-11月全国总决赛现场竞赛",
+    "website": "",
+    "note": "【专业备赛指南】这属于程序算法类的顶尖赛事。极度看重个人算法基础，重点考察常用数据结构（链表/二叉树/图）、动态规划、搜索算法、数论与贪心算法。建议长期在 LeetCode, Codeforces 等平台高强度刷题训练。"
+  },
+  "4007": {
+    "id": 4007,
+    "tracks": [
+      "常规赛道：创新创意创业三创主赛道",
+      "跨境电商实战专项赛道",
+      "乡村振兴与地方产业实战赛道"
+    ],
+    "timeline": "每年11月-次年3月企业策划，4月-5月省赛，6月-7月全国决赛路演",
+    "website": "http://www.nuedc.com.cn/",
+    "note": "【专业备赛指南】这属于商业运营与大数据财务类的顶尖赛事。重点考察商业模式可行性、数据支撑度与团队答辩素质。通常涉及数十页商业策划书的编写和现场答辩。团队中建议包含经管文科生负责商业框架，以及技术生负责数据展示。"
+  },
+  "4008": {
+    "id": 4008,
+    "tracks": [
+      "CTF 线上夺旗挑战赛 (Web/Reverse/Pwn/Crypto/Misc)",
+      "AWD 线下实时攻防对抗赛 (Attack with Defence)",
+      "网络安全应急响应与系统加固",
+      "信息安全作品设计与开发"
+    ],
+    "timeline": "每年4月-5月线上初赛，6月-7月线下全国决赛攻防对抗",
+    "website": "",
+    "note": "【专业备赛指南】这属于信息安全攻防类的顶尖赛事。国家级网络安全技术对抗。需要极高水平的代码分析、逆向破解、漏洞发掘与漏洞修补能力。建议利用 CTFHub, Bugku 长期训练，紧跟最新的 CVE 漏洞发布。"
+  },
+  "4009": {
+    "id": 4009,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "http://www.craic.org.cn/",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "4010": {
+    "id": 4010,
+    "tracks": [
+      "分站赛 (各省站及各大分区站线下比赛)",
+      "女生专场站 (鼓励女性算法爱好者者的专属赛事)",
+      "全国总决赛 (CCPC Final - 顶级战队争夺)"
+    ],
+    "timeline": "每年9月-11月各分区站竞赛，11-12月全国总决赛现场角逐",
+    "website": "https://ccpc.io/",
+    "note": "由中国计算机学会主办的大学生程序设计竞赛，赛制与ACM-ICPC完全一致。题目质量和考察深度处于极高水准，是证明算法实力的首选双子星赛事之一。"
+  },
+  "4011": {
+    "id": 4011,
+    "tracks": [
+      "强网先锋线上夺旗赛 (CTF - 涵盖 Web、Crypto、Pwn、Reverse、Misc 极高难度)",
+      "强网拟态线下攻防对抗赛 (拟态防御原理与黑客攻防对抗)",
+      "线下全国总决赛 (AWD 实时网络对抗 + Real World 漏洞破解)"
+    ],
+    "timeline": "每年5-6月报名及线上初赛，7月线下总决赛。",
+    "website": "https://www.qwb.org.cn/",
+    "note": "【保研 T3: 5/4/3分 重要加分】由国家网信部门指导、国内网络安全界公认规格最高、题目难度最大、极具权威的“安全国赛”。\n1. 【CTF 实操重点】：线上初赛题目的脑洞和难度极大。团队分工必须明确：Web 安全手精通 PHP/Node.js 深度渗透，逆向手（Reverse）精通 IDA 动态逆向破解与沙箱绕过，漏洞利用手（Pwn）精通内核级 Pwn 漏洞利用，密码手（Crypto）精通椭圆曲线加密算法（ECC）与高阶代数攻击；\n2. 【AWD 实操】：需要极其熟练地使用自动化监控防御脚本（WAF）、自动日志分析脚本，在 5 分钟内快速定位并修补靶机漏洞，实现高强度的自动化防御与攻击。"
+  },
+  "4012": {
+    "id": 4012,
+    "tracks": [
+      "CTF 线上夺旗挑战赛 (Web/Reverse/Pwn/Crypto/Misc)",
+      "AWD 线下实时攻防对抗赛 (Attack with Defence)",
+      "网络安全应急响应与系统加固",
+      "信息安全作品设计与开发"
+    ],
+    "timeline": "每年4月-5月线上初赛，6月-7月线下全国决赛攻防对抗",
+    "website": "",
+    "note": "【专业备赛指南】这属于信息安全攻防类的顶尖赛事。国家级网络安全技术对抗。需要极高水平的代码分析、逆向破解、漏洞发掘与漏洞修补能力。建议利用 CTFHub, Bugku 长期训练，紧跟最新的 CVE 漏洞发布。"
+  },
+  "4013": {
+    "id": 4013,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "http://www.craic.org.cn/",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "4014": {
+    "id": 4014,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "4015": {
+    "id": 4015,
+    "tracks": [
+      "高水平算法解题主赛道",
+      "软件开发实践组",
+      "团体对抗排位赛",
+      "高校精英邀请赛"
+    ],
+    "timeline": "每年3月-5月省赛选拔，10月-11月全国总决赛现场竞赛",
+    "website": "",
+    "note": "【专业备赛指南】这属于程序算法类的顶尖赛事。极度看重个人算法基础，重点考察常用数据结构（链表/二叉树/图）、动态规划、搜索算法、数论与贪心算法。建议长期在 LeetCode, Codeforces 等平台高强度刷题训练。"
+  },
+  "4016": {
+    "id": 4016,
+    "tracks": [
+      "科技创新硬件组 (物联网/机器人/智能装备)",
+      "软件创意组 (Web/小程序/移动App开发)",
+      "创业商业策划组 (商业BP路演)"
+    ],
+    "timeline": "每年9-10月申报项目，11月进行校级展示与决赛路演",
+    "website": "http://www.nuedc.com.cn/",
+    "note": "天博杯科技创新大赛。区域与高校联合主办的科技创新比赛。重在项目完成度与创新创意的路演展示。适合携带本科课程设计、毕业设计或大创项目直接参赛。"
+  },
+  "4017": {
+    "id": 4017,
+    "tracks": [
+      "MCM 连续数学建模组",
+      "MCM 离散数学建模组",
+      "ICM 大数据与分类预测组",
+      "ICM 网络运筹学分析组",
+      "环境政策与可持续性分析组"
+    ],
+    "timeline": "每年1月美赛，每年9月国赛（均为连续3-4天封闭开发），其余比赛分布在4-5月",
+    "website": "http://www.mcm.edu.cn/",
+    "note": "【专业备赛指南】这属于数学建模数据分析类的顶尖赛事。建模求解、编程求解、英文/中文论文撰写三位一体。极度考察团队配合。建议编程手精通 Python/Matlab 常用数学库（numpy/pandas/scikit-learn），使用 LaTeX 精美排版论文。"
+  },
+  "4018": {
+    "id": 4018,
+    "tracks": [
+      "MCM 连续数学建模组",
+      "MCM 离散数学建模组",
+      "ICM 大数据与分类预测组",
+      "ICM 网络运筹学分析组",
+      "环境政策与可持续性分析组"
+    ],
+    "timeline": "每年1月美赛，每年9月国赛（均为连续3-4天封闭开发），其余比赛分布在4-5月",
+    "website": "http://www.mcm.edu.cn/",
+    "note": "【专业备赛指南】这属于数学建模数据分析类的顶尖赛事。建模求解、编程求解、英文/中文论文撰写三位一体。极度考察团队配合。建议编程手精通 Python/Matlab 常用数学库（numpy/pandas/scikit-learn），使用 LaTeX 精美排版论文。"
+  },
+  "4019": {
+    "id": 4019,
+    "tracks": [
+      "CTF 线上夺旗挑战赛 (Web/Reverse/Pwn/Crypto/Misc)",
+      "AWD 线下实时攻防对抗赛 (Attack with Defence)",
+      "网络安全应急响应与系统加固",
+      "信息安全作品设计与开发"
+    ],
+    "timeline": "每年4月-5月线上初赛，6月-7月线下全国决赛攻防对抗",
+    "website": "",
+    "note": "【专业备赛指南】这属于信息安全攻防类的顶尖赛事。国家级网络安全技术对抗。需要极高水平的代码分析、逆向破解、漏洞发掘与漏洞修补能力。建议利用 CTFHub, Bugku 长期训练，紧跟最新的 CVE 漏洞发布。"
+  },
+  "4020": {
+    "id": 4020,
+    "tracks": [
+      "高水平算法解题主赛道",
+      "软件开发实践组",
+      "团体对抗排位赛",
+      "高校精英邀请赛"
+    ],
+    "timeline": "每年3月-5月省赛选拔，10月-11月全国总决赛现场竞赛",
+    "website": "",
+    "note": "【专业备赛指南】这属于程序算法类的顶尖赛事。极度看重个人算法基础，重点考察常用数据结构（链表/二叉树/图）、动态规划、搜索算法、数论与贪心算法。建议长期在 LeetCode, Codeforces 等平台高强度刷题训练。"
+  },
+  "4021": {
+    "id": 4021,
+    "tracks": [
+      "MCM 连续数学建模组",
+      "MCM 离散数学建模组",
+      "ICM 大数据与分类预测组",
+      "ICM 网络运筹学分析组",
+      "环境政策与可持续性分析组"
+    ],
+    "timeline": "每年1月美赛，每年9月国赛（均为连续3-4天封闭开发），其余比赛分布在4-5月",
+    "website": "http://www.mcm.edu.cn/",
+    "note": "【专业备赛指南】这属于数学建模数据分析类的顶尖赛事。建模求解、编程求解、英文/中文论文撰写三位一体。极度考察团队配合。建议编程手精通 Python/Matlab 常用数学库（numpy/pandas/scikit-learn），使用 LaTeX 精美排版论文。"
+  },
+  "4022": {
+    "id": 4022,
+    "tracks": [
+      "CTF 线上夺旗挑战赛 (Web/Reverse/Pwn/Crypto/Misc)",
+      "AWD 线下实时攻防对抗赛 (Attack with Defence)",
+      "网络安全应急响应与系统加固",
+      "信息安全作品设计与开发"
+    ],
+    "timeline": "每年4月-5月线上初赛，6月-7月线下全国决赛攻防对抗",
+    "website": "",
+    "note": "【专业备赛指南】这属于信息安全攻防类的顶尖赛事。国家级网络安全技术对抗。需要极高水平的代码分析、逆向破解、漏洞发掘与漏洞修补能力。建议利用 CTFHub, Bugku 长期训练，紧跟最新的 CVE 漏洞发布。"
+  },
+  "4023": {
+    "id": 4023,
+    "tracks": [
+      "嵩山生态环境大数据大模型应用创意与开发",
+      "黄河流域生态环境保护智能监测算法 (图像遥感分类、气象预警算法)",
+      "绿色低碳软件设计与物联网节能硬件研发"
+    ],
+    "timeline": "每年6月-8月方案编写，9月-10月系统开发与测试，11月总决赛现场答辩。",
+    "website": "http://www.swcpu-cpc.org/",
+    "note": "【保研 T3: 5/4/3分 重要加分】河南省重点支持、紧扣黄河流域生态保护战略的软件与算法挑战赛。偏向生态数据挖掘和算法创新。\n1. 【大模型方向】：是计算机及 AI 专业的加分主力。建议开发“黄河生态大模型问答专家”或“遥感图像自动解译分类系统”（使用 PyTorch 进行深度学习建模）；\n2. 【答辩策略】：项目必须紧密结合真实的“嵩山”及“黄河”生态环境数据。需要使用高质量的遥感影像数据集展示算法对植被覆盖度或水质浑浊度的真实预测精度。"
+  },
+  "4024": {
+    "id": 4024,
+    "tracks": [
+      "国产超算平台科学计算并行加速赛道 (气象、流体力学算子加速)",
+      "大模型智能应用算子推理跑分加速赛道 (基于国产 AI 芯片的深度学习调优)",
+      "量子计算仿真算法应用与开发赛道"
+    ],
+    "timeline": "每年5-7月线上开发调试，8月提交加速报告与跑分代码，9月全国总决赛。",
+    "website": "https://cas-gp.sugon.com/",
+    "note": "【保研 T3: 5/4/3分 重要加分】由中科院等主办的超算与并行计算顶级赛事。提供曙光先进计算平台（超算算力账号）支持。\n1. 【算子加速核心】：计算机底层基础要扎实。需要在国产 DCU 芯片（类似于 AMD 架构）上对常用的三维卷积、傅里叶变换等算子进行手写底层 CUDA/HIP 算子优化；\n2. 【攻关秘籍】：备赛需要掌握矩阵乘法的分块（Tiling）技术、共享内存（Shared Memory）极致加速访存、以及循环展开（Loop Unrolling）技术。"
+  },
+  "4025": {
+    "id": 4025,
+    "tracks": [
+      "智能算法与多模态感知赛道",
+      "硬件系统搭建与PCB画板",
+      "自主导航避障（ROS/SLAM）",
+      "机械手臂与经典控制工程",
+      "大模型应用创意与边缘计算落地"
+    ],
+    "timeline": "每年11月-次年3月战队组建与研发，4月-6月中期省赛筛选，7月-8月全国总决赛现场角逐",
+    "website": "",
+    "note": "【专业备赛指南】这属于人工智能与硬件机器人类的顶尖赛事。软硬件高度交叉的高含金量赛事。需要电控（单片机/嵌入式协议）、算法（机器视觉/深度学习/轨迹规划）与机械工程师（SolidWorks）强力配合。建议提前采购核心传感器与真机联调。"
+  },
+  "4026": {
+    "id": 4026,
+    "tracks": [
+      "并行算法挑战赛 (三场高难度科学计算极限性能跑分优化)",
+      "智能应用挑战赛 (大模型或深度学习算子推理速度优化跑分)",
+      "并行系统工程挑战赛 (超算集群架构运维与性能加速)"
+    ],
+    "timeline": "每年5-7月线上初赛排位，8月-9月复赛性能跑分，10月全国总决赛现场跑分答辩。",
+    "website": "http://www.pac-china.org/",
+    "note": "【保研 T3: 5/4/3分 重要加分】超算与高性能计算领域国内规格最高、影响力最深的挑战赛之一。极度考察对底层 C/C++ 代码的极限调优能力。\n1. 【计算优化要点】：重点关注多线程并发（OpenMP/MPI）、GPU 异构计算（CUDA/OpenCL/SYCL）、英特尔 AVX-512 指令级向量化优化；\n2. 【避坑建议】：备赛时必须精通 Linux 系统下的性能分析工具（如 VTune、gprof），找准 CPU 访存瓶颈（Cache Miss）与分支预测失败（Branch Misprediction）的盲点，进行高水准的算法重构。"
+  },
+  "4027": {
+    "id": 4027,
+    "tracks": [
+      "神威超算平台并行程序设计与调优赛道 (底层 C/C++ 与 MPI 优化)",
+      "国产申威多核处理器指令级性能加速与显式访存赛道 (片上多核架构)"
+    ],
+    "timeline": "每年6月-8月线上报名与超算账号分配，9月代码调优，10月现场决赛PK。",
+    "website": "http://www.swcpu-cpc.org/",
+    "note": "【保研 T3: 5/4/3分 重要加分】高性能计算领域的极硬核底层优化大赛。选手在国产“神威·太湖之光”超算系统上对特定的科学计算或深度学习核心算子进行极致调优。\n1. 【核心技术】：极度看重申威主板的片上多核架构。必须掌握多核并行设计（MPI/Athread 线程库）、DMA 显式访存调优以避免片上内存带宽瓶颈、使用申威平台专属的指令级向量化加速（SIMD）；\n2. 【调优诀窍】：建议仔细阅读《神威多核编程手册》，优化核心代码循环结构，减少冗余访存，调优冷热分支，使计算资源占满率达到 90% 以上。"
+  }
+};
+
+    function loadPlanScoresFromLocalStorage() {
+      const candidateKeys = [
+        'ai_plan_score_records_v1',
+        'ai_plan_score_records_v2',
+        'ai-plan-grade-record-v1',
+        'ai-plan-grade-record-v2'
+      ];
+
+      let loaded = null;
+      for (const key of candidateKeys) {
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            loaded = parsed;
+            break;
+          }
+        } catch(e) {}
+      }
+
+      planScores = {};
+      if (loaded) {
+        AI_PLAN_COURSES.forEach(course => {
+          if (loaded[course.id] !== undefined) {
+            const normalized = normalizeScore(loaded[course.id]);
+            if (normalized !== '') planScores[course.id] = normalized;
+            return;
+          }
+          const legacyKey = `${course.semester}||${course.name}`;
+          if (loaded[legacyKey] !== undefined) {
+            const normalized = normalizeScore(loaded[legacyKey]);
+            if (normalized !== '') planScores[course.id] = normalized;
+          }
+        });
+      }
+    }
+
+    function savePlanScoresToLocalStorage() {
+      localStorage.setItem(STORAGE_PLAN, JSON.stringify(planScores));
+    }
+
+    function loadCoreCourseNamesFromLocalStorage() {
+      const raw = localStorage.getItem(STORAGE_CORE_NAMES);
+      coreCourseNames = {};
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          Object.entries(parsed).forEach(([id, name]) => {
+            const clean = String(name || '').trim();
+            if (clean) coreCourseNames[id] = clean;
+          });
+        }
+      } catch(e) {
+        coreCourseNames = {};
+      }
+    }
+
+    function saveCoreCourseNamesToLocalStorage() {
+      localStorage.setItem(STORAGE_CORE_NAMES, JSON.stringify(coreCourseNames));
+    }
+
+
+    // Server-Side Data Fetchers
+    async function loadUserDataFromServer() {
+      try {
+        const res = await fetch('/api/user-data');
+        if (res.ok) {
+          userData = await res.json();
+          if (!Array.isArray(userData)) userData = [];
+        } else {
+          throw new Error('Load failed');
+        }
+      } catch (err) {
+        console.error('Load user data error, using local fallback:', err);
+        loadUserDataFromLocalStorage();
+      }
+    }
+
+    async function loadPlanScoresFromServer() {
+      try {
+        const res = await fetch('/api/plan-scores');
+        if (res.ok) {
+          planScores = await res.json();
+        }
+      } catch (err) {
+        console.error('Load plan scores error, using local fallback:', err);
+        loadPlanScoresFromLocalStorage();
+      }
+    }
+
+    async function loadCoreCourseNamesFromServer() {
+      try {
+        const res = await fetch('/api/core-course-names');
+        if (res.ok) {
+          coreCourseNames = await res.json();
+        }
+      } catch (err) {
+        console.error('Load core course names error, using local fallback:', err);
+        loadCoreCourseNamesFromLocalStorage();
+      }
+    }
+
+    function getEditableTab() {
+      return ['小试牛刀','技能·进化池','课外·云端研习','我的历程'].includes(activeTab);
+    }
+
+    function getDisplayData() {
+      if (activeTab === '竞赛总览') return [...competitionsA, ...competitionsB];
+      if (activeTab === 'A类·综测竞赛') return competitionsA;
+      if (activeTab === 'B类·综测竞赛') return competitionsB;
+      if (activeTab === '论文·学术高地') return academicPapers;
+      if (activeTab === '专利·知识产权') return patents;
+      if (activeTab === '小试牛刀') return userData.filter(d => d.category === 'comp');
+      if (activeTab === '技能·进化池') return userData.filter(d => d.category === 'skill');
+      if (activeTab === '课外·云端研习') return userData.filter(d => d.category === 'course');
+      if (activeTab === '我的历程') return userData;
+      return [];
+    }
+
+    function renderNav() {
+      navEl.innerHTML = NAV_ITEMS.map(item => {
+        if (item.divider) return `<div class="divider"></div>`;
+        return `<button class="nav-item ${activeTab === item.id ? 'active' : ''}" data-nav="${item.id}">
+          <span>${item.id}</span>
+        </button>`;
+      }).join('');
+
+      navEl.querySelectorAll('[data-nav]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const nextTab = btn.dataset.nav;
+          if (nextTab !== activeTab) {
+            activeTab = nextTab;
+            resetToolbarState({ resetPlanFilters: activeTab !== '培养方案成绩' });
+          }
+          renderApp();
+        });
+      });
+    }
+
+    function renderPlan() {
+      headerMarkText.textContent = '培养方案成绩';
+      headerTitle.textContent = '人工智能专业课程成绩记录';
+      headerSub.textContent = 'AI GRADE PANEL · ZZU GPA';
+      addBtn.style.display = 'none';
+      semesterFilter.style.display = 'inline-flex';
+      typeFilter.style.display = 'inline-flex';
+      relationFilter.style.display = 'none';
+      searchInput.placeholder = '搜索课程名...';
+      syncToolbarState();
+
+      semesterFilter.innerHTML = `
+        <option value="全部">全部学期</option>
+        ${AI_PLAN_SEMESTERS.map(sem => `<option value="${sem}" ${selectedSemester === sem ? 'selected' : ''}>${sem}</option>`).join('')}
+      `;
+      typeFilter.innerHTML = `
+        <option value="全部">全部类别</option>
+        ${['通识课','专业课','限选课','院选修'].map(t => `<option value="${t}" ${selectedType === t ? 'selected' : ''}>${t}</option>`).join('')}
+      `;
+
+      const filtered = AI_PLAN_COURSES.filter(item =>
+        (!searchTerm || getCourseDisplayName(item).toLowerCase().includes(searchTerm.toLowerCase()) || (item.note || '').toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (selectedSemester === '全部' || item.semester === selectedSemester) &&
+        (selectedType === '全部' || item.type === selectedType)
+      );
+      const filteredCredits = filtered.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const filterParts = [];
+      if (selectedSemester !== '全部') filterParts.push(selectedSemester);
+      if (selectedType !== '全部') filterParts.push(selectedType);
+      if (searchTerm) filterParts.push(`搜索：${searchTerm}`);
+      const filterLabel = filterParts.length ? filterParts.join(' · ') : '全部课程';
+      const doneCourses = AI_PLAN_COURSES.filter(item => hasValidScore(planScores[item.id]));
+      const gpaDoneCourses = doneCourses.filter(isGpaIncluded);
+
+      const allCredits = AI_PLAN_COURSES.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const doneCredits = doneCourses.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const gpaDoneCredits = gpaDoneCourses.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const avgScore = gpaDoneCredits
+        ? gpaDoneCourses.reduce((sum, c) => sum + Number(planScores[c.id]) * Number(c.credit || 0), 0) / gpaDoneCredits
+        : 0;
+      const avgGpa = gpaDoneCredits
+        ? gpaDoneCourses.reduce((sum, c) => sum + scoreToGpa(planScores[c.id]) * Number(c.credit || 0), 0) / gpaDoneCredits
+        : 0;
+
+      const stats = `
+        <div class="stats-grid">
+          <div class="stat-card c-gold">
+            <div class="stat-title">课程</div>
+            <div class="stat-value">${doneCourses.length}/${AI_PLAN_COURSES.length}</div>
+            <div class="stat-sub">已完成 / 总课程数</div>
+          </div>
+          <div class="stat-card c-green">
+            <div class="stat-title">学分</div>
+            <div class="stat-value">${formatCredit(doneCredits)}/${formatCredit(allCredits)}</div>
+            <div class="stat-sub">已完成 / 当前列表总学分</div>
+          </div>
+          <div class="stat-card c-teal">
+            <div class="stat-title">当前筛选</div>
+            <div class="stat-value">${formatCredit(filteredCredits)}</div>
+            <div class="stat-sub">${filtered.length} 门 · ${escapeHtml(filterLabel)}</div>
+          </div>
+          <div class="stat-card c-blue">
+            <div class="stat-title">加权平均分</div>
+            <div class="stat-value">${gpaDoneCredits ? avgScore.toFixed(1) : '-'}</div>
+            <div class="stat-sub">排除任选/不计GPA项</div>
+          </div>
+          <div class="stat-card c-purple">
+            <div class="stat-title">平均 GPA</div>
+            <div class="stat-value">${gpaDoneCredits ? avgGpa.toFixed(2) : '-'}</div>
+            <div class="stat-sub">GPA学分 ${formatCredit(gpaDoneCredits)} / ${formatCredit(doneCredits)}</div>
+          </div>
+        </div>`;
+
+      const semesterHtml = AI_PLAN_SEMESTERS.map((semester, idx) => {
+        const semCourses = filtered.filter(item => item.semester === semester);
+        if (!semCourses.length) return '';
+        const semCredits = semCourses.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+        const dotClass = `dot-${idx + 1}`;
+        return `
+          <section class="${selectedSemester !== '全部' && selectedSemester === semester ? 'semester-section current-semester' : 'semester-section'}">
+            <div class="semester-head">
+              <span class="semester-dot ${dotClass}"></span>
+              <div>
+                <h3 class="semester-title">${semester}</h3>
+                <div class="semester-sub">${semCourses.length} 门课程 · ${formatCredit(semCredits)} 学分</div>
+              </div>
+            </div>
+            <div class="course-list">
+              ${semCourses.map(item => {
+                const score = planScores[item.id] ?? '';
+                const gpa = isGpaIncluded(item) ? scoreToGpa(score) : '';
+                const completed = hasValidScore(score);
+                const displayName = getCourseDisplayName(item);
+                const titleHtml = item.editableName
+                  ? `<input class="course-name-input" value="${escapeHtml(coreCourseNames[item.id] || '')}" placeholder="${escapeHtml(item.placeholder || '填写课程名')}" data-core-name-id="${item.id}" />`
+                  : `<h4>${escapeHtml(displayName)}</h4>`;
+                const gpaText = isGpaIncluded(item) ? (gpa === '' ? '-' : Number(gpa).toFixed(1)) : '不计';
+                return `
+                  <div class="${completed ? `course-row type-${item.type} completed-row` : `course-row type-${item.type}`}" data-row-id="${item.id}">
+                    <div class="course-main">
+                      <span class="semester-dot ${dotClass}" style="margin-top:4px;"></span>
+                      <div class="course-title ${completed ? 'done' : ''}" data-title-id="${item.id}">
+                        ${titleHtml}
+                        <div class="course-simple-meta">
+                          <span>${escapeHtml(item.semester)}</span>
+                          <span>·</span>
+                          <span>${escapeHtml(item.type)}</span>
+                          <span>·</span>
+                          <span>${formatCredit(item.credit)} 学分</span>
+                          ${isGpaIncluded(item) ? '' : '<span class="scope-badge">不计 GPA</span>'}
+                        </div>
+                        ${item.note ? `<div class="course-note-line">${escapeHtml(item.note)}</div>` : ''}
+                      </div>
+                    </div>
+                    <div class="pill">
+                      <div class="pill-label">学分</div>
+                      <div class="pill-value">${formatCredit(item.credit)}</div>
+                    </div>
+                    <div class="pill">
+                      <div class="pill-label">GPA</div>
+                      <div class="pill-value" data-gpa-id="${item.id}">${gpaText}</div>
+                    </div>
+                    <input class="score-input" type="number" min="0" max="100" step="0.1" inputmode="decimal" value="${escapeHtml(score)}" placeholder="成绩" data-score-id="${item.id}" />
+                  </div>`;
+              }).join('')}
+            </div>
+          </section>`;
+      }).join('');
+
+      mainContent.innerHTML = stats + (semesterHtml || '<div class="empty">WAIT FOR ENTRY</div>');
+
+      mainContent.querySelectorAll('[data-score-id]').forEach(input => {
+        input.addEventListener('keydown', (e) => {
+          if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
+        });
+
+        input.addEventListener('input', (e) => {
+          const inputEl = e.target;
+          const id = Number(inputEl.dataset.scoreId);
+          const checked = validateScoreInput(inputEl);
+
+          if (!checked.valid) return;
+          if (checked.empty) delete planScores[id];
+          else planScores[id] = checked.value;
+
+          // Save locally first for offline support
+          savePlanScoresToLocalStorage();
+
+          // Save score asynchronously to Node.js backend if online
+          if (isHttp) {
+            fetch('/api/plan-scores', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                courseId: id,
+                score: checked.empty ? null : checked.value
+              })
+            }).catch(err => console.error('Save score error:', err));
+          }
+
+          const gpaEl = document.querySelector(`[data-gpa-id="${id}"]`);
+          const rowEl = document.querySelector(`[data-row-id="${id}"]`);
+          const titleEl = document.querySelector(`[data-title-id="${id}"]`);
+          const current = planScores[id];
+          const hasScore = hasValidScore(current);
+
+          const course = AI_PLAN_COURSES.find(c => Number(c.id) === id);
+          const detailGpaEl = document.querySelector(`[data-row-gpa-text-id="${id}"]`);
+          const statusEl = document.querySelector(`[data-status-id="${id}"]`);
+          const gpaText = !isGpaIncluded(course)
+            ? '不计'
+            : (scoreToGpa(current) === '' ? '-' : Number(scoreToGpa(current)).toFixed(1));
+
+          if (gpaEl) {
+            gpaEl.textContent = gpaText;
+          }
+          if (detailGpaEl) {
+            detailGpaEl.textContent = `绩点：${gpaText}`;
+          }
+          if (statusEl) {
+            statusEl.textContent = `状态：${hasScore ? '已录入' : '未录入'}`;
+            statusEl.classList.toggle('done-status', hasScore);
+            statusEl.classList.toggle('pending-status', !hasScore);
+          }
+          if (rowEl) {
+            rowEl.classList.toggle('completed-row', hasScore);
+          }
+          if (titleEl) {
+            titleEl.classList.toggle('done', hasScore);
+          }
+
+          updatePlanStatsOnly();
+        });
+      });
+
+      mainContent.querySelectorAll('[data-core-name-id]').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const id = Number(e.target.dataset.coreNameId);
+          const clean = e.target.value.trim();
+          if (clean) coreCourseNames[id] = clean;
+          else delete coreCourseNames[id];
+          
+          // Save locally first for offline support
+          saveCoreCourseNamesToLocalStorage();
+
+          // Save core course custom name asynchronously to Node.js backend if online
+          if (isHttp) {
+            fetch('/api/core-course-names', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                courseId: id,
+                customName: clean || null
+              })
+            }).catch(err => console.error('Save core course name error:', err));
+          }
+        });
+      });
+    }
+
+    function getCardHeaderMeta(tab) {
+      if (tab === '竞赛总览') {
+        return { mark: '综测竞赛目录', title: '竞赛总览', sub: '综合素质测评 · 科技创新与学科竞赛' };
+      }
+      if (tab === 'A类·综测竞赛') {
+        return { mark: '综测竞赛目录', title: 'A类竞赛', sub: '综合素质测评 · A类竞赛目录' };
+      }
+      if (tab === 'B类·综测竞赛') {
+        return { mark: '综测竞赛目录', title: 'B类竞赛', sub: '综合素质测评 · B类竞赛目录' };
+      }
+      if (tab === '论文·学术高地' || tab === '专利·知识产权') {
+        return { mark: '保研科技创新', title: tab, sub: 'RECOMMENDATION INNOVATION SCORE' };
+      }
+      if (['小试牛刀','技能·进化池','课外·云端研习','我的历程'].includes(tab)) {
+        return { mark: '个人成长记录', title: tab, sub: 'PERSONAL GROWTH TRACKING' };
+      }
+      return { mark: 'AI 进阶之路', title: tab, sub: 'TECH INNOVATION SCORE TRACKING' };
+    }
+
+    function renderCards() {
+      const headerMeta = getCardHeaderMeta(activeTab);
+      headerMarkText.textContent = headerMeta.mark;
+      headerTitle.textContent = headerMeta.title;
+      headerSub.textContent = headerMeta.sub;
+      addBtn.style.display = getEditableTab() ? 'inline-flex' : 'none';
+      semesterFilter.style.display = 'none';
+      typeFilter.style.display = 'none';
+
+      const baseData = getDisplayData();
+      const competitionMode = isCompetitionTab(activeTab);
+      if (competitionMode) {
+        relationFilter.style.display = 'inline-flex';
+        renderRelationFilterOptions(baseData);
+        searchInput.placeholder = '搜索竞赛名 / 分值 / 标签...';
+      } else {
+        relationFilter.style.display = 'none';
+        selectedRelationTag = '全部';
+        searchInput.placeholder = activeTab === '论文·学术高地'
+          ? '搜索论文类型 / 分值...'
+          : activeTab === '专利·知识产权'
+            ? '搜索专利类型 / 分值...'
+            : '搜索当前记录...';
+      }
+      syncToolbarState();
+
+      const lowerSearch = searchTerm.toLowerCase();
+      const displayData = baseData.filter(item => {
+        if (!item || !item.name) return false;
+        const relationTags = getRelationTags(item);
+        const matchSearch = !searchTerm ||
+          item.name.toLowerCase().includes(lowerSearch) ||
+          ((item.note || '').toLowerCase().includes(lowerSearch)) ||
+          relationTags.some(tag => tag.toLowerCase().includes(lowerSearch));
+        const matchRelation = !competitionMode || selectedRelationTag === '全部' || relationTags.includes(selectedRelationTag);
+        return matchSearch && matchRelation;
+      });
+
+      if (!displayData.length) {
+        mainContent.innerHTML = '<div class="empty">NO MATCHED ENTRY</div>';
+        return;
+      }
+
+      const borderClasses = ['c-gold','c-green','c-red','c-blue','c-purple'];
+      mainContent.innerHTML = `
+        <div class="cards-grid">
+          ${displayData.map((item, idx) => {
+            const scoreTags = getCompTags(item, activeTab);
+            const relationTags = competitionMode ? getRelationTags(item) : [];
+            const statClass = borderClasses[idx % borderClasses.length];
+            const removable = getEditableTab();
+            return `
+              <div class="info-card ${statClass} ${isPostgradBonus(item, activeTab) ? 'postgrad-purple' : ''}" data-card-id="${item.id}">
+                ${removable ? `<button data-remove="${item.id}" style="position:absolute;right:14px;top:14px;border:none;background:#f7f9fc;color:#b6bfcc;width:30px;height:30px;border-radius:12px;cursor:pointer;z-index:10;">×</button>` : ''}
+                <div>
+                  <h3 class="title">${escapeHtml(item.name)}</h3>
+                  ${(!isCompetitionTab(activeTab) && item.note) ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
+                </div>
+
+                <div>
+                  <div class="tag-wrap">
+                    ${scoreTags.map(t => `<span class="tag ${t.type}">${escapeHtml(t.text)}</span>`).join('')}
+                    ${relationTags.map(tag => `<span class="tag relation">#${escapeHtml(tag)}</span>`).join('')}
+                    ${item.result ? `<span class="tag gray">${escapeHtml(item.result)}</span>` : ''}
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-small">${escapeHtml(getSubCategoryName(item))}</span>
+                    ${item.status ? `<span class="status ${item.status === '完结' ? 's-done' : 's-run'}">${escapeHtml(item.status)}</span>` : ''}
+                  </div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>`;
+
+      // 1. Delete button click event listeners (stops propagation to prevent modal popup)
+      mainContent.querySelectorAll('[data-remove]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Stop event bubbling so modal doesn't open
+          const id = btn.dataset.remove;
+          
+          userData = userData.filter(item => String(item.id) !== String(id));
+          saveUserDataToLocalStorage();
+          renderCards();
+
+          if (isHttp) {
+            fetch(`/api/user-data/${id}`, {
+              method: 'DELETE'
+            }).catch(err => console.error('Delete user record error:', err));
+          }
+        });
+      });
+
+      // 2. Click cards to open the Competition Details Modal (Optimistic and robust)
+      mainContent.querySelectorAll('.info-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          // Ignore clicks specifically targeted at the delete overlay button
+          if (e.target.dataset.remove !== undefined) return;
+          
+          const id = card.dataset.cardId;
+          if (id) {
+            openCompDetailModal(id);
+          }
+        });
+      });
+    }
+
+    function openModal() {
+      modalMask.classList.add('show');
+      recordName.value = '';
+      recordStatus.value = '预备';
+      recordTime.value = '';
+      recordResult.value = '';
+      recordNote.value = '';
+      formCategory = activeTab === '技能·进化池' ? 'skill' : activeTab === '课外·云端研习' ? 'course' : 'comp';
+      renderCategoryButtons();
+    }
+
+    function closeModal() {
+      modalMask.classList.remove('show');
+    }
+
+    function renderCategoryButtons() {
+      const options = [
+        { id:'skill', label:'技能进化' },
+        { id:'course', label:'云端研习' },
+        { id:'comp', label:'个人牛刀' },
+      ];
+      categoryButtons.innerHTML = options.map(opt => `
+        <button type="button" class="cat-btn ${formCategory === opt.id ? 'active' : ''}" data-cat="${opt.id}">
+          ${opt.label}
+        </button>`).join('');
+      categoryButtons.querySelectorAll('[data-cat]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          formCategory = btn.dataset.cat;
+          renderCategoryButtons();
+        });
+      });
+    }
+
+    function renderApp() {
+      renderNav();
+      if (activeTab === '培养方案成绩') renderPlan();
+      else renderCards();
+    }
+
+    addBtn.addEventListener('click', openModal);
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelModal').addEventListener('click', closeModal);
+    modalMask.addEventListener('click', (e) => {
+      if (e.target === modalMask) closeModal();
+    });
+
+    recordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!recordName.value.trim()) return;
+      
+      const newRecord = {
+        id: String(Date.now()), // String representation of ID
+        name: recordName.value.trim(),
+        category: formCategory,
+        status: recordStatus.value,
+        time: recordTime.value,
+        result: recordResult.value.trim(),
+        note: recordNote.value.trim(),
+      };
+      
+      // 1. Unshift into local in-memory array immediately
+      userData.unshift(newRecord);
+      
+      // 2. Save locally if offline
+      saveUserDataToLocalStorage();
+      
+      // 3. Immediately close modal and re-render screen
+      closeModal();
+      renderCards();
+
+      // 4. Save user record asynchronously to backend database if online
+      if (isHttp) {
+        try {
+          await fetch('/api/user-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newRecord)
+          });
+        } catch (err) {
+          console.error('Save user record error:', err);
+        }
+      }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      searchTerm = e.target.value.trim();
+      if (activeTab === '培养方案成绩') renderPlan();
+      else renderCards();
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+      if (activeTab === '培养方案成绩') {
+        resetToolbarState({ resetPlanFilters: true });
+        renderPlan();
+      } else {
+        resetToolbarState();
+        renderCards();
+      }
+    });
+
+    semesterFilter.addEventListener('change', (e) => {
+      selectedSemester = e.target.value;
+      renderPlan();
+    });
+
+    typeFilter.addEventListener('change', (e) => {
+      selectedType = e.target.value;
+      renderPlan();
+    });
+
+    relationFilter.addEventListener('change', (e) => {
+      selectedRelationTag = e.target.value;
+      renderCards();
+    });
+
+
+    function calcPlanStats() {
+      const filtered = AI_PLAN_COURSES.filter(item =>
+        (!searchTerm || getCourseDisplayName(item).toLowerCase().includes(searchTerm.toLowerCase()) || (item.note || '').toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (selectedSemester === '全部' || item.semester === selectedSemester) &&
+        (selectedType === '全部' || item.type === selectedType)
+      );
+      const filteredCredits = filtered.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const filterParts = [];
+      if (selectedSemester !== '全部') filterParts.push(selectedSemester);
+      if (selectedType !== '全部') filterParts.push(selectedType);
+      if (searchTerm) filterParts.push(`搜索：${searchTerm}`);
+      const filterLabel = filterParts.length ? filterParts.join(' · ') : '全部课程';
+      const doneCourses = AI_PLAN_COURSES.filter(item => hasValidScore(planScores[item.id]));
+      const gpaDoneCourses = doneCourses.filter(isGpaIncluded);
+      const allCredits = AI_PLAN_COURSES.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const doneCredits = doneCourses.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const gpaDoneCredits = gpaDoneCourses.reduce((sum, c) => sum + Number(c.credit || 0), 0);
+      const avgScore = gpaDoneCredits
+        ? gpaDoneCourses.reduce((sum, c) => sum + Number(planScores[c.id]) * Number(c.credit || 0), 0) / gpaDoneCredits
+        : 0;
+      const avgGpa = gpaDoneCredits
+        ? gpaDoneCourses.reduce((sum, c) => sum + scoreToGpa(planScores[c.id]) * Number(c.credit || 0), 0) / gpaDoneCredits
+        : 0;
+      return { filtered, filteredCredits, filterLabel, doneCourses, allCredits, doneCredits, gpaDoneCredits, avgScore, avgGpa };
+    }
+
+    function updatePlanStatsOnly() {
+      const statsWrap = document.querySelector('.stats-grid');
+      if (!statsWrap || activeTab !== '培养方案成绩') return;
+      const { filtered, filteredCredits, filterLabel, doneCourses, allCredits, doneCredits, gpaDoneCredits, avgScore, avgGpa } = calcPlanStats();
+      statsWrap.innerHTML = `
+        <div class="stat-card c-gold">
+          <div class="stat-title">课程</div>
+          <div class="stat-value">${doneCourses.length}/${AI_PLAN_COURSES.length}</div>
+          <div class="stat-sub">已完成 / 总课程数</div>
+        </div>
+        <div class="stat-card c-green">
+          <div class="stat-title">学分</div>
+          <div class="stat-value">${formatCredit(doneCredits)}/${formatCredit(allCredits)}</div>
+          <div class="stat-sub">已完成 / 当前列表总学分</div>
+        </div>
+        <div class="stat-card c-teal">
+          <div class="stat-title">当前筛选</div>
+          <div class="stat-value">${formatCredit(filteredCredits)}</div>
+          <div class="stat-sub">${filtered.length} 门 · ${escapeHtml(filterLabel)}</div>
+        </div>
+        <div class="stat-card c-blue">
+          <div class="stat-title">加权平均分</div>
+          <div class="stat-value">${doneCredits ? avgScore.toFixed(1) : '-'}</div>
+          <div class="stat-sub">排除任选/不计GPA项</div>
+        </div>
+        <div class="stat-card c-purple">
+          <div class="stat-title">平均 GPA</div>
+          <div class="stat-value">${doneCredits ? avgGpa.toFixed(2) : '-'}</div>
+          <div class="stat-sub">GPA学分 ${formatCredit(gpaDoneCredits)} / ${formatCredit(doneCredits)}</div>
+        </div>
+      `;
+    }
+
+    // Interactive Competition details management
+    let currentDetailId = null;
+    let currentDetailData = null;
+
+    async function openCompDetailModal(id) {
+      currentDetailId = id;
+      currentDetailData = null;
+
+      // 1. Reset Modal views to Display Mode
+      document.getElementById('compDetailDisplayMode').style.display = 'block';
+      document.getElementById('compDetailEditForm').style.display = 'none';
+      document.getElementById('editCompBtn').style.display = 'inline-flex';
+      document.getElementById('cancelEditCompBtn').style.display = 'none';
+      document.getElementById('saveCompBtn').style.display = 'none';
+
+      // 2. Set title dynamically from UI card
+      const cardEl = document.querySelector(`[data-card-id="${id}"]`);
+      const cardTitle = cardEl ? cardEl.querySelector('.title').textContent : '竞赛详情';
+      document.getElementById('compDetailTitle').textContent = cardTitle;
+
+      // 3. Slide in the modal mask
+      document.getElementById('compDetailModalMask').classList.add('show');
+
+      // 4. Load details either from Server DB or LocalStorage fallback
+      let details = null;
+      if (isHttp) {
+        try {
+          const res = await fetch(`/api/competition-details/${id}`);
+          if (res.ok) details = await res.json();
+        } catch(e) {
+          console.error('Fetch competition details server error:', e);
+        }
+      } else {
+        const raw = localStorage.getItem('ai_comp_details_v1');
+        let localDetails = {};
+        try { if (raw) localDetails = JSON.parse(raw); } catch(e){}
+        details = localDetails[id] || null;
+      }
+
+      // If no details exist, use offline seeds or basic default template
+      if (!details) {
+        details = OFFLINE_SEED_DETAILS[id] || {
+          id: Number(id),
+          tracks: ["常规主赛道组"],
+          timeline: "请关注当年官方发布的具体赛程时间",
+          website: "",
+          note: "暂无备赛攻略，欢迎您点击“编辑资料”按钮在此键入并保存个人心得！"
+        };
+      }
+
+      currentDetailData = details;
+
+      // 5. Populate Display Content
+      const tracksEl = document.getElementById('compDetailTracks');
+      tracksEl.innerHTML = (details.tracks && details.tracks.length) 
+        ? details.tracks.map(t => {
+            const borderClasses = ['rose', 'blue', 'green', 'purple', 'orange'];
+            const cls = borderClasses[Math.abs(t.hashCode()) % borderClasses.length];
+            return `<span class="tag ${cls}">${escapeHtml(t)}</span>`;
+          }).join('')
+        : `<span class="tag gray">主赛道</span>`;
+
+      document.getElementById('compDetailTimeline').textContent = details.timeline || '未设置时间';
+      
+      const websiteLink = document.getElementById('compDetailWebsite');
+      if (details.website && details.website.trim()) {
+        websiteLink.href = details.website;
+        document.getElementById('compDetailWebsiteSection').style.display = 'block';
+      } else {
+        document.getElementById('compDetailWebsiteSection').style.display = 'none';
+      }
+
+      document.getElementById('compDetailNote').textContent = details.note || '暂无备赛笔记。点击“编辑资料”即可新增笔记！';
+    }
+
+    // String Hash utility for consistent color rendering
+    String.prototype.hashCode = function() {
+      let hash = 0;
+      for (let i = 0; i < this.length; i++) {
+        hash = this.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash;
+    };
+
+    // Close detail modal events
+    document.getElementById('closeCompModal').addEventListener('click', () => {
+      document.getElementById('compDetailModalMask').classList.remove('show');
+    });
+    
+    const compDetailModalMask = document.getElementById('compDetailModalMask');
+    compDetailModalMask.addEventListener('click', (e) => {
+      if (e.target === compDetailModalMask) {
+        compDetailModalMask.classList.remove('show');
+      }
+    });
+
+    // Detail Modal Actions: Edit Mode
+    const editCompBtn = document.getElementById('editCompBtn');
+    const cancelEditCompBtn = document.getElementById('cancelEditCompBtn');
+    const saveCompBtn = document.getElementById('saveCompBtn');
+    const displayModeEl = document.getElementById('compDetailDisplayMode');
+    const editFormEl = document.getElementById('compDetailEditForm');
+
+    editCompBtn.addEventListener('click', () => {
+      if (!currentDetailData) return;
+
+      displayModeEl.style.display = 'none';
+      editFormEl.style.display = 'flex';
+      
+      editCompBtn.style.display = 'none';
+      cancelEditCompBtn.style.display = 'inline-flex';
+      saveCompBtn.style.display = 'inline-flex';
+
+      // Populate input values
+      document.getElementById('editCompTracks').value = (currentDetailData.tracks || []).join(', ');
+      document.getElementById('editCompTimeline').value = currentDetailData.timeline || '';
+      document.getElementById('editCompWebsite').value = currentDetailData.website || '';
+      document.getElementById('editCompNote').value = currentDetailData.note || '';
+    });
+
+    cancelEditCompBtn.addEventListener('click', () => {
+      displayModeEl.style.display = 'block';
+      editFormEl.style.display = 'none';
+      
+      editCompBtn.style.display = 'inline-flex';
+      cancelEditCompBtn.style.display = 'none';
+      saveCompBtn.style.display = 'none';
+    });
+
+    saveCompBtn.addEventListener('click', async () => {
+      if (!currentDetailId) return;
+
+      const tracksVal = document.getElementById('editCompTracks').value;
+      const timelineVal = document.getElementById('editCompTimeline').value;
+      const websiteVal = document.getElementById('editCompWebsite').value;
+      const noteVal = document.getElementById('editCompNote').value;
+
+      // Splits tracks by Chinese and English commas
+      const parsedTracks = tracksVal.split(/[,，]/).map(t => t.trim()).filter(Boolean);
+
+      const updatedData = {
+        tracks: parsedTracks,
+        timeline: timelineVal.trim(),
+        website: websiteVal.trim(),
+        note: noteVal.trim()
+      };
+
+      // Update in-memory copy
+      currentDetailData = {
+        ...currentDetailData,
+        ...updatedData
+      };
+
+      // 1. Save locally to LocalStorage for offline support
+      const raw = localStorage.getItem('ai_comp_details_v1');
+      let localDetails = {};
+      try { if (raw) localDetails = JSON.parse(raw); } catch(e){}
+      localDetails[currentDetailId] = {
+        id: Number(currentDetailId),
+        ...updatedData
+      };
+      localStorage.setItem('ai_comp_details_v1', JSON.stringify(localDetails));
+
+      // 2. Save asynchronously to server database if online
+      if (isHttp) {
+        try {
+          await fetch(`/api/competition-details/${currentDetailId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData)
+          });
+        } catch (err) {
+          console.error('Save competition details server error:', err);
+        }
+      }
+
+      // 3. Switch back to display mode and update contents
+      displayModeEl.style.display = 'block';
+      editFormEl.style.display = 'none';
+      
+      editCompBtn.style.display = 'inline-flex';
+      cancelEditCompBtn.style.display = 'none';
+      saveCompBtn.style.display = 'none';
+
+      // Repopulate display UI values
+      const tracksEl = document.getElementById('compDetailTracks');
+      tracksEl.innerHTML = (currentDetailData.tracks && currentDetailData.tracks.length)
+        ? currentDetailData.tracks.map(t => {
+            const borderClasses = ['rose', 'blue', 'green', 'purple', 'orange'];
+            const cls = borderClasses[Math.abs(t.hashCode()) % borderClasses.length];
+            return `<span class="tag ${cls}">${escapeHtml(t)}</span>`;
+          }).join('')
+        : `<span class="tag gray">主赛道</span>`;
+
+      document.getElementById('compDetailTimeline').textContent = currentDetailData.timeline || '未设置时间';
+      
+      const websiteLink = document.getElementById('compDetailWebsite');
+      if (currentDetailData.website && currentDetailData.website.trim()) {
+        websiteLink.href = currentDetailData.website;
+        document.getElementById('compDetailWebsiteSection').style.display = 'block';
+      } else {
+        document.getElementById('compDetailWebsiteSection').style.display = 'none';
+      }
+
+      document.getElementById('compDetailNote').textContent = currentDetailData.note || '暂无备赛笔记。';
+    });
+
+
+    // Full-stack initialization: handles LocalStorage sync migration & pulls data from server APIs
+    async function initApp() {
+      // 0. Graceful offline fallback: if opened via file://, completely skip server connections
+      if (!isHttp) {
+        console.log('Running in local offline file mode. Enabling LocalStorage fallback.');
+        loadUserDataFromLocalStorage();
+        loadPlanScoresFromLocalStorage();
+        loadCoreCourseNamesFromLocalStorage();
+        renderApp();
+        return;
+      }
+
+      const localUser = localStorage.getItem(STORAGE_USER);
+      const localPlan = localStorage.getItem(STORAGE_PLAN);
+      const localNames = localStorage.getItem(STORAGE_CORE_NAMES);
+
+      // 1. One-time automated migration sync from LocalStorage to Server Database (Only if running on HTTP server)
+      if (localUser || localPlan || localNames) {
+        console.log('Detecting legacy LocalStorage data. Migrating to server database...');
+        let planData = null;
+        let namesData = null;
+        let userDataParsed = null;
+        
+        try { if (localPlan) planData = JSON.parse(localPlan); } catch(e){}
+        try { if (localNames) namesData = JSON.parse(localNames); } catch(e){}
+        try { if (localUser) userDataParsed = JSON.parse(localUser); } catch(e){}
+
+        if (planData || namesData || userDataParsed) {
+          try {
+            const res = await fetch('/api/sync', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                planScores: planData,
+                coreCourseNames: namesData,
+                userData: userDataParsed
+              })
+            });
+            if (res.ok) {
+              console.log('Migration sync successful! Disabling LocalStorage...');
+              localStorage.removeItem(STORAGE_USER);
+              localStorage.removeItem(STORAGE_PLAN);
+              localStorage.removeItem(STORAGE_CORE_NAMES);
+              
+              // Also clear legacy keys just in case
+              localStorage.removeItem('ai_plan_score_records_v2');
+              localStorage.removeItem('ai-plan-grade-record-v1');
+              localStorage.removeItem('ai-plan-grade-record-v2');
+            }
+          } catch(err) {
+            console.error('Migration sync failed:', err);
+          }
+        }
+      }
+
+      // 2. Fetch fresh data from backend Express REST APIs
+      await Promise.all([
+        loadUserDataFromServer(),
+        loadPlanScoresFromServer(),
+        loadCoreCourseNamesFromServer()
+      ]);
+
+      // 3. Render dashboard
+      renderApp();
+    }
+
+    // Start full stack app
+    initApp();
+    
+  </script>
+
+
+<script>
+document.addEventListener('keydown', function(e) {
+  if (!e.target.classList.contains('score-input')) return;
+  if (e.key !== 'Enter') return;
+
+  e.preventDefault();
+  const inputs = Array.from(document.querySelectorAll('.score-input'));
+  const index = inputs.indexOf(e.target);
+  if (index >= 0 && index < inputs.length - 1) {
+    inputs[index + 1].focus();
+    inputs[index + 1].select();
+  }
+});
+</script>
+
+</body>
+</html>
+
+<style>
+.pill-label { font-weight: 500 !important; }
+.pill-value { font-weight: 600 !important; }
+
+.score-input {
+  transition: all 0.15s ease;
+}
+.score-input:focus {
+  border-color: #bba7f0;
+  box-shadow: 0 0 0 3px rgba(187,167,240,0.2);
+  outline: none;
+}
+
+.course-name-input {
+  width: 100%;
+  border: 1px solid #e7dff0;
+  background: rgba(255,255,255,.78);
+  color: #26324b;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 16px;
+  font-weight: 700;
+  outline: none;
+}
+.course-name-input:focus {
+  border-color: #bba7f0;
+  box-shadow: 0 0 0 3px rgba(187,167,240,0.16);
+}
+.course-name-input::placeholder {
+  color: #aaa0b7;
+  font-weight: 600;
+}
+
+/* 通识课改为淡紫，更统一 */
+.type-通识课 {
+  background: #f5f0ff !important;
+  border-left: 4px solid #cdbaf3 !important;
+}
+
+
+/* Stage 15: 成绩行精简 + 色彩重整 */
+.course-row {
+  border: 1px solid #e9e2ef !important;
+  border-left-width: 6px !important;
+  border-radius: 24px !important;
+  padding: 14px 16px !important;
+  background: #fff !important;
+  box-shadow: 0 10px 22px rgba(39, 47, 76, .045) !important;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+}
+.course-row:hover {
+  transform: translateY(-1px);
+  border-color: #d7c9ea !important;
+  box-shadow: 0 12px 26px rgba(78, 64, 112, .075) !important;
+  filter: none !important;
+}
+.type-通识课 {
+  border-left-color: #c9b8ef !important;
+  background: linear-gradient(90deg, rgba(201,184,239,.14), #fff 30%) !important;
+}
+.type-专业课 {
+  border-left-color: #a9d6a1 !important;
+  background: linear-gradient(90deg, rgba(169,214,161,.14), #fff 30%) !important;
+}
+.type-限选课 {
+  border-left-color: #f0c987 !important;
+  background: linear-gradient(90deg, rgba(240,201,135,.15), #fff 30%) !important;
+}
+.type-院选修 {
+  border-left-color: #a9c9f4 !important;
+  background: linear-gradient(90deg, rgba(169,201,244,.14), #fff 30%) !important;
+}
+.course-row.completed-row {
+  background: #fbfafc !important;
+  border-color: #e5ddeb !important;
+}
+.course-row.completed-row .course-title h4 {
+  color: #7c7586 !important;
+}
+.course-row.completed-row .pill,
+.course-row.completed-row .score-input {
+  background: rgba(255,255,255,.72) !important;
+  border-color: #e5ddeb !important;
+  color: #756f7e !important;
+}
+.course-simple-meta {
+  margin-top: 7px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: #9a91a7;
+  font-size: 13px;
+  font-weight: 650;
+}
+.scope-badge {
+  margin-left: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid #ead9a8;
+  background: #fff8e7;
+  color: #9a7a2c;
+  font-size: 11px;
+  font-weight: 750;
+}
+.course-note-line {
+  margin-top: 6px !important;
+  color: #aaa1b1 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+}
+.course-title.done .course-simple-meta,
+.course-title.done .course-note-line {
+  opacity: .72;
+}
+.course-name-input {
+  background: rgba(255,255,255,.92) !important;
+  border-color: #e3d9ec !important;
+}
+
+
+/* Stage 16: 学期圆点色彩 —— 圆点只表达“学期”，不再跟课程性质混用 */
+.semester-dot {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 999px !important;
+  flex: 0 0 12px !important;
+}
+.dot-1 { background: #c8b5f0 !important; box-shadow: 0 0 0 5px rgba(200,181,240,.22) !important; }
+.dot-2 { background: #a9c9f4 !important; box-shadow: 0 0 0 5px rgba(169,201,244,.22) !important; }
+.dot-3 { background: #9fd8c1 !important; box-shadow: 0 0 0 5px rgba(159,216,193,.22) !important; }
+.dot-4 { background: #b9dfa1 !important; box-shadow: 0 0 0 5px rgba(185,223,161,.22) !important; }
+.dot-5 { background: #f0c987 !important; box-shadow: 0 0 0 5px rgba(240,201,135,.24) !important; }
+.dot-6 { background: #efb3a2 !important; box-shadow: 0 0 0 5px rgba(239,179,162,.23) !important; }
+.dot-7 { background: #e6aecb !important; box-shadow: 0 0 0 5px rgba(230,174,203,.22) !important; }
+.dot-8 { background: #b6bdf4 !important; box-shadow: 0 0 0 5px rgba(182,189,244,.22) !important; }
+.semester-head .semester-dot {
+  width: 13px !important;
+  height: 13px !important;
+  flex-basis: 13px !important;
+}
+.course-main .semester-dot {
+  width: 10px !important;
+  height: 10px !important;
+  flex-basis: 10px !important;
+  margin-left: 1px;
+}
+
+
+
+/* Stage 17: 已录入状态强化 —— 不再灰掉，而是给完成项一个清晰但轻盈的“完成层” */
+.course-row {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.course-row:not(.completed-row) .score-input {
+  background: rgba(255,255,255,.94) !important;
+}
+
+.course-row.completed-row {
+  border-color: #cfe7d7 !important;
+  box-shadow:
+    0 12px 26px rgba(60, 110, 78, .075) !important,
+    inset 0 0 0 1px rgba(109, 185, 132, .24) !important;
+}
+.course-row.type-通识课.completed-row {
+  border-left-color: #c9b8ef !important;
+  background:
+    linear-gradient(90deg, rgba(201,184,239,.18), rgba(255,255,255,.96) 28%),
+    linear-gradient(270deg, rgba(222,248,230,.92), rgba(255,255,255,0) 48%) !important;
+}
+.course-row.type-专业课.completed-row {
+  border-left-color: #a9d6a1 !important;
+  background:
+    linear-gradient(90deg, rgba(169,214,161,.20), rgba(255,255,255,.96) 28%),
+    linear-gradient(270deg, rgba(222,248,230,.92), rgba(255,255,255,0) 48%) !important;
+}
+.course-row.type-限选课.completed-row {
+  border-left-color: #f0c987 !important;
+  background:
+    linear-gradient(90deg, rgba(240,201,135,.18), rgba(255,255,255,.96) 28%),
+    linear-gradient(270deg, rgba(222,248,230,.92), rgba(255,255,255,0) 48%) !important;
+}
+.course-row.type-院选修.completed-row {
+  border-left-color: #a9c9f4 !important;
+  background:
+    linear-gradient(90deg, rgba(169,201,244,.18), rgba(255,255,255,.96) 28%),
+    linear-gradient(270deg, rgba(222,248,230,.92), rgba(255,255,255,0) 48%) !important;
+}
+
+.course-row.completed-row::after {
+  content: "✓";
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #e8f8ec;
+  border: 1px solid #bfe7ca;
+  color: #47a564;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 5px 12px rgba(71,165,100,.10);
+}
+
+.course-row.completed-row .course-title h4,
+.course-title.done h4 {
+  color: #26324b !important;
+  text-decoration: none !important;
+}
+.course-row.completed-row .course-title p,
+.course-row.completed-row .course-simple-meta,
+.course-row.completed-row .course-note-line {
+  opacity: .86 !important;
+}
+
+.course-row.completed-row .score-input:not(.invalid) {
+  background: #ecf9f0 !important;
+  border-color: #a8dfb8 !important;
+  color: #287a43 !important;
+  box-shadow: inset 0 0 0 1px rgba(87,170,107,.06) !important;
+}
+.course-row.completed-row .score-input:not(.invalid):focus {
+  border-color: #69bf82 !important;
+  box-shadow: 0 0 0 3px rgba(105,191,130,.20) !important;
+}
+
+.course-row.completed-row .pill {
+  background: rgba(255,255,255,.82) !important;
+  border-color: #d7eadc !important;
+}
+.course-row.completed-row .pill-value {
+  color: #365f43 !important;
+}
+
+@media (max-width: 1300px) {
+  .course-row.completed-row::after {
+    right: 14px;
+    top: 14px;
+  }
+}
+
+</style>
+/* 竞赛卡片说明文字降噪 */
+.info-card .note {
+  font-size: 13px;
+  color: #9aa4b6;
+  line-height: 1.45;
+  margin-top: 12px;
+}
