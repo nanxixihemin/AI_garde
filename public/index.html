@@ -2653,16 +2653,43 @@
       return ['小试牛刀','技能·进化池','课外·云端研习','我的历程'].includes(activeTab);
     }
 
+    function getSortedUserData(list) {
+      const categoryPriority = {
+        'comp': 1,
+        'skill': 2,
+        'course': 3
+      };
+      return [...list].sort((a, b) => {
+        // 1. Compare category priority
+        const priorityA = categoryPriority[a.category] || 99;
+        const priorityB = categoryPriority[b.category] || 99;
+        
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB;
+        }
+        
+        // 2. Compare start times descending (most recent first)
+        const timeA = a.startTime || a.time || '';
+        const timeB = b.startTime || b.time || '';
+        
+        if (!timeA && !timeB) return 0;
+        if (!timeA) return 1; // Unspecified dates go to the bottom of the category
+        if (!timeB) return -1;
+        
+        return timeB.localeCompare(timeA);
+      });
+    }
+
     function getDisplayData() {
       if (activeTab === '竞赛总览') return [...competitionsA, ...competitionsB];
       if (activeTab === 'A类·综测竞赛') return competitionsA;
       if (activeTab === 'B类·综测竞赛') return competitionsB;
       if (activeTab === '论文·学术高地') return academicPapers;
       if (activeTab === '专利·知识产权') return patents;
-      if (activeTab === '小试牛刀') return userData.filter(d => d.category === 'comp');
-      if (activeTab === '技能·进化池') return userData.filter(d => d.category === 'skill');
-      if (activeTab === '课外·云端研习') return userData.filter(d => d.category === 'course');
-      if (activeTab === '我的历程') return userData;
+      if (activeTab === '小试牛刀') return getSortedUserData(userData.filter(d => d.category === 'comp'));
+      if (activeTab === '技能·进化池') return getSortedUserData(userData.filter(d => d.category === 'skill'));
+      if (activeTab === '课外·云端研习') return getSortedUserData(userData.filter(d => d.category === 'course'));
+      if (activeTab === '我的历程') return getSortedUserData(userData);
       return [];
     }
 
