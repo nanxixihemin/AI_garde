@@ -105,6 +105,8 @@ const db = {
       category: String(record.category),
       status: String(record.status),
       time: record.time || '',
+      startTime: record.startTime || '',
+      endTime: record.endTime || '',
       result: record.result || '',
       note: record.note || '',
       created_at: record.created_at || Date.now()
@@ -208,6 +210,8 @@ const db = {
               category: String(item.category),
               status: String(item.status),
               time: item.time || '',
+              startTime: item.startTime || '',
+              endTime: item.endTime || '',
               result: item.result || '',
               note: item.note || '',
               created_at: item.created_at || itemCreatedAt

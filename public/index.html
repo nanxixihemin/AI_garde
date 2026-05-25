@@ -1194,6 +1194,62 @@
     </div>
   </div>
 
+  <!-- Personal Growth Record Detail Modal (For logging updates) -->
+  <div class="modal-mask" id="recordDetailModalMask">
+    <div class="modal" style="width: min(600px, 100%);">
+      <div class="modal-head" style="background: linear-gradient(135deg, #f0f7ff 0%, #fff 100%);">
+        <div>
+          <div class="header-mark" style="margin-bottom: 2px;" id="recordDetailCategory">个人历程详情</div>
+          <h2 class="modal-title" id="recordDetailName" style="font-size: 20px; font-weight: 800; color: #1e2c4b; margin: 0;">记录名称</h2>
+        </div>
+        <button class="modal-close" id="closeRecordDetailModal">×</button>
+      </div>
+      <div class="modal-body" style="padding: 24px 26px; gap: 20px; max-height: 80vh; overflow-y: auto; display: flex; flex-direction: column;">
+        
+        <!-- Info Grid (Status, Time, Result) -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: #f8fafc; padding: 14px; border-radius: 18px; border: 1px solid #edf2f7;">
+          <div>
+            <div style="font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase;">当前状态</div>
+            <div id="recordDetailStatus" style="font-size: 14px; font-weight: 700; color: #2f3747; margin-top: 4px;">-</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase;">历程时间</div>
+            <div id="recordDetailTime" style="font-size: 14px; font-weight: 700; color: #2f3747; margin-top: 4px;">-</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase;">取得成果</div>
+            <div id="recordDetailResult" style="font-size: 14px; font-weight: 700; color: #2f3747; margin-top: 4px;">-</div>
+          </div>
+        </div>
+
+        <!-- Initial Notes / Overview -->
+        <div>
+          <div style="font-weight: 700; color: #6f7d90; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">历程备注 / 详情描述</div>
+          <div id="recordDetailNote" style="background: #fdfaf7; border-left: 4px solid #f6d1a6; border-radius: 16px; padding: 14px 16px; font-weight: 600; color: #50445d; line-height: 1.5; font-size: 14px; white-space: pre-wrap;">
+            暂无备注
+          </div>
+        </div>
+
+        <!-- Progress Log Timeline (Supplementary Contents) -->
+        <div>
+          <div style="font-weight: 700; color: #6f7d90; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">进展与每次补充内容</div>
+          <div id="recordDetailLogs" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+            <!-- Append logs timeline here -->
+          </div>
+        </div>
+
+        <!-- Form to Add Supplementary Log -->
+        <div style="border-top: 1px solid #f0f2f7; padding-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-weight: 700; color: #6f7d90; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">添加新的补充内容</div>
+          <div style="display: flex; gap: 8px; align-items: stretch;">
+            <textarea id="recordNewLogText" class="field" placeholder="键入此次进展或补充内容..." style="min-height: 48px; height: 48px; resize: none; border-radius: 14px; padding: 10px 14px; flex: 1; margin: 0; font-size: 13px;"></textarea>
+            <button id="recordAddLogBtn" class="btn-primary" style="padding: 0 20px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; white-space: nowrap; height: 48px;">追加记录</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const NAV_ITEMS = [
       { id: '培养方案成绩' },
@@ -1509,7 +1565,9 @@
       else {
         const bonusTags = getPostgradBonusTags(name);
         if (bonusTags.length) tags.push(...bonusTags);
-        else tags.push({ text: '普通综测加分', type: 'gray' });
+        else if (currentTab !== '我的历程' && currentTab !== '技能·进化池' && currentTab !== '课外·云端研习' && currentTab !== '小试牛刀') {
+          tags.push({ text: '普通综测加分', type: 'gray' });
+        }
       }
 
       if (item.category === 'course') tags.push({ text: 'Coursera/MOOC', type: 'purple' });
@@ -2940,26 +2998,12 @@
     }
 
     function getSortedUserData(list) {
-      const categoryPriority = {
-        'comp': 1,
-        'skill': 2,
-        'course': 3
-      };
       return [...list].sort((a, b) => {
-        // 1. Compare category priority
-        const priorityA = categoryPriority[a.category] || 99;
-        const priorityB = categoryPriority[b.category] || 99;
-        
-        if (priorityA !== priorityB) {
-          return priorityA - priorityB;
-        }
-        
-        // 2. Compare start times descending (most recent first)
         const timeA = a.startTime || a.time || '';
         const timeB = b.startTime || b.time || '';
         
         if (!timeA && !timeB) return 0;
-        if (!timeA) return 1; // Unspecified dates go to the bottom of the category
+        if (!timeA) return 1;
         if (!timeB) return -1;
         
         return timeB.localeCompare(timeA);
@@ -3353,15 +3397,19 @@
         });
       });
 
-      // 2. Click cards to open the Competition Details Modal (Optimistic and robust)
+      // 2. Click cards to open the Details Modal
       mainContent.querySelectorAll('.info-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          // Ignore clicks specifically targeted at the delete overlay button
-          if (e.target.dataset.remove !== undefined) return;
+          // Ignore clicks targeted at remove/edit buttons
+          if (e.target.dataset.remove !== undefined || e.target.dataset.editRecord !== undefined) return;
           
           const id = card.dataset.cardId;
           if (id) {
-            openCompDetailModal(id);
+            if (getEditableTab()) {
+              openRecordDetailModal(id);
+            } else {
+              openCompDetailModal(id);
+            }
           }
         });
       });
@@ -3670,6 +3718,122 @@
       if (e.target === compDetailModalMask) {
         compDetailModalMask.classList.remove('show');
       }
+    });
+
+    // Helper to parse notes and supplementary logs
+    function parseRecordNoteAndLogs(rawNote) {
+      const lines = (rawNote || '').split('\n');
+      const logs = [];
+      const mainNotes = [];
+      
+      lines.forEach(line => {
+        const match = line.trim().match(/^\[([\d\-\s\:]+)\]\s*(.*)$/);
+        if (match) {
+          logs.push({ time: match[1], content: match[2] });
+        } else {
+          mainNotes.push(line);
+        }
+      });
+      
+      return {
+        mainNote: mainNotes.join('\n').trim(),
+        logs: logs
+      };
+    }
+
+    let currentDetailRecordId = null;
+
+    function openRecordDetailModal(id) {
+      currentDetailRecordId = id;
+      const record = userData.find(r => String(r.id) === String(id));
+      if (!record) return;
+
+      // Populate text fields
+      document.getElementById('recordDetailName').textContent = record.name || '历程记录';
+      document.getElementById('recordDetailStatus').textContent = record.status || '预备';
+      document.getElementById('recordDetailResult').textContent = record.result || '进行中 / 无';
+      
+      const timeParts = [];
+      const sTime = record.startTime || record.time || '';
+      const eTime = record.endTime || '';
+      if (sTime) timeParts.push(sTime);
+      if (eTime) timeParts.push(eTime);
+      document.getElementById('recordDetailTime').textContent = timeParts.length ? timeParts.join(' 至 ') : '未指定';
+
+      const catName = getSubCategoryName(record);
+      document.getElementById('recordDetailCategory').textContent = catName;
+
+      // Parse and display note and supplementary logs
+      const { mainNote, logs } = parseRecordNoteAndLogs(record.note);
+      document.getElementById('recordDetailNote').textContent = mainNote || '暂无备注';
+
+      const logsEl = document.getElementById('recordDetailLogs');
+      if (logs.length === 0) {
+        logsEl.innerHTML = `<div style="color:var(--muted); font-size:12px; font-style:italic; padding: 10px 0; text-align: center;">暂无补充记录，请在下方追加记录！</div>`;
+      } else {
+        logsEl.innerHTML = logs.map(log => `
+          <div style="background: #fdfdfd; border: 1px solid #edf2f7; border-left: 3px solid #4372ec; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="font-size: 10px; color: var(--muted); font-weight: 700;">${log.time}</div>
+            <div style="font-size: 13px; color: var(--text); font-weight: 600; line-height: 1.4;">${escapeHtml(log.content)}</div>
+          </div>
+        `).join('');
+      }
+
+      // Clear input
+      document.getElementById('recordNewLogText').value = '';
+
+      // Show modal
+      document.getElementById('recordDetailModalMask').classList.add('show');
+    }
+
+    // Close record detail modal events
+    document.getElementById('closeRecordDetailModal').addEventListener('click', () => {
+      document.getElementById('recordDetailModalMask').classList.remove('show');
+    });
+
+    const recordDetailModalMask = document.getElementById('recordDetailModalMask');
+    recordDetailModalMask.addEventListener('click', (e) => {
+      if (e.target === recordDetailModalMask) {
+        recordDetailModalMask.classList.remove('show');
+      }
+    });
+
+    // Handle Add Log Action
+    document.getElementById('recordAddLogBtn').addEventListener('click', async () => {
+      if (!currentDetailRecordId) return;
+      const record = userData.find(r => String(r.id) === String(currentDetailRecordId));
+      if (!record) return;
+
+      const logInput = document.getElementById('recordNewLogText');
+      const content = logInput.value.trim();
+      if (!content) return;
+
+      // Format time: YYYY-MM-DD HH:MM
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      
+      const newLogLine = `[${timeStr}] ${content}`;
+      record.note = record.note ? `${record.note}\n${newLogLine}` : newLogLine;
+
+      // Save locally
+      saveUserDataToLocalStorage();
+
+      // Save user record asynchronously to backend database if online
+      if (isHttp) {
+        try {
+          await fetch('/api/user-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(record)
+          });
+        } catch (err) {
+          console.error('Save user record note update error:', err);
+        }
+      }
+
+      // Re-render dashboard and refresh this modal
+      renderCards();
+      openRecordDetailModal(currentDetailRecordId);
     });
 
     // Detail Modal Actions: Edit Mode

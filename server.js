@@ -91,14 +91,14 @@ app.get('/api/user-data', async (req, res) => {
 
 // 6. POST User Growth Data Record (add or update)
 app.post('/api/user-data', async (req, res) => {
-  const { id, name, category, status, time, result, note } = req.body;
+  const { id, name, category, status, time, startTime, endTime, result, note } = req.body;
 
   if (!id || !name || !category || !status) {
     return res.status(400).json({ error: 'id, name, category, status are required' });
   }
 
   try {
-    const savedRecord = await db.saveUserDataRecord({ id, name, category, status, time, result, note });
+    const savedRecord = await db.saveUserDataRecord({ id, name, category, status, time, startTime, endTime, result, note });
     res.json({ success: true, action: 'saved', data: savedRecord });
   } catch (err) {
     res.status(500).json({ error: err.message });
