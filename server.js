@@ -158,14 +158,38 @@ app.post('/api/competition-details/:id', async (req, res) => {
 
 // 10. POST Sync API (bulk import from LocalStorage on first run)
 app.post('/api/sync', async (req, res) => {
-  const { planScores, coreCourseNames, userData } = req.body;
+  const { planScores, coreCourseNames, userData, habits } = req.body;
 
   try {
-    await db.syncAll({ planScores, coreCourseNames, userData });
+    await db.syncAll({ planScores, coreCourseNames, userData, habits });
     console.log('Bulk sync completed successfully.');
     res.json({ success: true, message: 'Bulk migration sync completed successfully.' });
   } catch (err) {
     console.error('Bulk sync failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 11. GET Habits
+app.get('/api/habits', async (req, res) => {
+  try {
+    const habits = await db.getHabits();
+    res.json(habits);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 12. POST Habits
+app.post('/api/habits', async (req, res) => {
+  try {
+    const habits = req.body;
+    if (!Array.isArray(habits)) {
+      return res.status(400).json({ error: 'Body must be an array of habits' });
+    }
+    const saved = await db.saveHabits(habits);
+    res.json({ success: true, data: saved });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

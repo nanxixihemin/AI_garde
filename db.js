@@ -224,6 +224,42 @@ const db = {
       currentList.sort((a, b) => b.created_at - a.created_at);
       await safeWriteJson(path.join(DATA_DIR, 'user_data.json'), currentList);
     }
+
+    // Sync Habits
+    if (habits && Array.isArray(habits)) {
+      await db.saveHabits(habits);
+    }
+  },
+
+  // 6. Habit Loops Database Operations
+  getHabits: async () => {
+    const filePath = path.join(DATA_DIR, 'habits.json');
+    // If the habits.json doesn't exist, seed it with the default "30天听力与口语闭环计划"
+    const exists = await fs.access(filePath).then(() => true).catch(() => false);
+    if (!exists) {
+      const now = new Date();
+      const sDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+      const defaultHabits = [
+        {
+          id: "habit_default_listening",
+          title: "30天听力与口语闭环计划",
+          subtitle: "10min 听力对齐 + 5min 原生回响",
+          daysCount: 30,
+          startDate: sDate,
+          completedDays: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
+          created_at: Date.now()
+        }
+      ];
+      await safeWriteJson(filePath, defaultHabits);
+      return defaultHabits;
+    }
+    return safeReadJson(filePath, []);
+  },
+
+  saveHabits: async (habits) => {
+    const filePath = path.join(DATA_DIR, 'habits.json');
+    await safeWriteJson(filePath, habits);
+    return habits;
   }
 };
 
