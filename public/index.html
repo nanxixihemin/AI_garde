@@ -557,8 +557,10 @@
       font-weight:700;
       text-transform:uppercase;
     }
-    .s-done { color:#37a36d; }
-    .s-run { color:#d29a2d; }
+    .s-prep { color:#8f7b6b; } /* 埋下种 */
+    .s-run { color:#4a90e2; }  /* 在浇水 */
+    .s-wait { color:#d29a2d; } /* 盼芽出 */
+    .s-done { color:#e55f82; } /* 花开时 */
 
     .empty {
       min-height:360px;
@@ -1333,9 +1335,10 @@
           <div style="display:flex; flex-direction:column; gap:4px;">
             <label style="font-size:10px; font-weight:700; color:var(--muted); padding-left:4px;">当前状态</label>
             <select class="field" id="recordStatus" style="margin-top:0;">
-              <option value="预备">预备</option>
-              <option value="进行">进行</option>
-              <option value="完结">完结</option>
+              <option value="埋下种">埋下种</option>
+              <option value="在浇水">在浇水</option>
+              <option value="盼芽出">盼芽出</option>
+              <option value="花开时">花开时</option>
             </select>
           </div>
           <div style="display:flex; flex-direction:column; gap:4px;">
@@ -1933,13 +1936,18 @@
         try {
           userData = JSON.parse(raw);
           if (!Array.isArray(userData)) userData = [];
+          userData.forEach(record => {
+            if (record.status === '预备') record.status = '埋下种';
+            else if (record.status === '进行') record.status = '在浇水';
+            else if (record.status === '完结') record.status = '花开时';
+          });
         } catch(e) {
           userData = [];
         }
       } else {
         userData = [
-          { id: 'd1', name: 'Coursera: Deep Learning Specialization', category: 'course', status: '进行', time: '2026-05', result: 'Certifying', note: '吴恩达深度学习课程' },
-          { id: 'd2', name: 'CUDA 并行计算初探', category: 'skill', status: '预备', time: '2026-08', result: '', note: '计划自学底层GPU加速' }
+          { id: 'd1', name: 'Coursera: Deep Learning Specialization', category: 'course', status: '在浇水', time: '2026-05', result: 'Certifying', note: '吴恩达深度学习课程' },
+          { id: 'd2', name: 'CUDA 并行计算初探', category: 'skill', status: '埋下种', time: '2026-08', result: '', note: '计划自学底层GPU加速' }
         ];
       }
     }
@@ -3327,6 +3335,11 @@
         if (res.ok) {
           userData = await res.json();
           if (!Array.isArray(userData)) userData = [];
+          userData.forEach(record => {
+            if (record.status === '预备') record.status = '埋下种';
+            else if (record.status === '进行') record.status = '在浇水';
+            else if (record.status === '完结') record.status = '花开时';
+          });
         } else {
           throw new Error('Load failed');
         }
@@ -3763,10 +3776,14 @@
                     <span class="meta-small">${escapeHtml(getSubCategoryName(item))}</span>
                     ${(item.startTime || item.endTime || item.time) ? `
                       <span class="meta-small" style="font-size:11px; color:var(--muted); font-weight:600; display:flex; align-items:center; gap:3px;">
-                        ${escapeHtml(item.startTime || item.time || '未指定')} 至 ${escapeHtml(item.endTime || (item.status === '完结' ? '已完结' : '进行中'))}
+                        ${escapeHtml(item.startTime || item.time || '未指定')} 至 ${escapeHtml(item.endTime || (item.status === '花开时' ? '已绽放' : '培育中'))}
                       </span>
                     ` : ''}
-                    ${item.status ? `<span class="status ${item.status === '完结' ? 's-done' : 's-run'}">${escapeHtml(item.status)}</span>` : ''}
+                    ${item.status ? `<span class="status ${
+                      item.status === '花开时' ? 's-done' :
+                      item.status === '在浇水' ? 's-run' :
+                      item.status === '盼芽出' ? 's-wait' : 's-prep'
+                    }">${escapeHtml(item.status)}</span>` : ''}
                   </div>
                 </div>
               </div>`;
@@ -3825,7 +3842,7 @@
       modalMask.classList.add('show');
       document.querySelector('#modalMask .modal-title').textContent = '添加历程记录';
       recordName.value = '';
-      recordStatus.value = '预备';
+      recordStatus.value = '埋下种';
       recordStartTime.value = '';
       recordEndTime.value = '';
       recordResult.value = '';
@@ -3842,7 +3859,7 @@
       modalMask.classList.add('show');
       document.querySelector('#modalMask .modal-title').textContent = '修改历程记录';
       recordName.value = record.name || '';
-      recordStatus.value = record.status || '预备';
+      recordStatus.value = record.status || '埋下种';
       recordStartTime.value = record.startTime || record.time || '';
       recordEndTime.value = record.endTime || '';
       recordResult.value = record.result || '';
@@ -4446,8 +4463,8 @@
 
       // Populate text fields
       document.getElementById('recordDetailName').textContent = record.name || '历程记录';
-      document.getElementById('recordDetailStatus').textContent = record.status || '预备';
-      document.getElementById('recordDetailResult').textContent = record.result || '进行中 / 无';
+      document.getElementById('recordDetailStatus').textContent = record.status || '埋下种';
+      document.getElementById('recordDetailResult').textContent = record.result || '暂无';
       
       const timeParts = [];
       const sTime = record.startTime || record.time || '';
