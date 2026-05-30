@@ -1584,7 +1584,7 @@
       { id: '专利·知识产权' },
       { divider: true },
       { id: '小试牛刀' },
-      { id: '未尽的小路' },
+      { id: '森林里未踏足的另一条路' },
       { id: '技能·进化池' },
       { id: '课外·云端研习' },
       { id: '我的历程' },
@@ -1897,7 +1897,7 @@
       else {
         const bonusTags = getPostgradBonusTags(name);
         if (bonusTags.length) tags.push(...bonusTags);
-        else if (currentTab !== '我的历程' && currentTab !== '技能·进化池' && currentTab !== '课外·云端研习' && currentTab !== '小试牛刀' && currentTab !== '未尽的小路') {
+        else if (currentTab !== '我的历程' && currentTab !== '技能·进化池' && currentTab !== '课外·云端研习' && currentTab !== '小试牛刀' && currentTab !== '森林里未踏足的另一条路') {
           tags.push({ text: '普通综测加分', type: 'gray' });
         }
       }
@@ -1921,7 +1921,7 @@
       if (item.category === 'skill') return '技能进化';
       if (item.category === 'course') return '云端研习';
       if (item.category === 'comp') return '个人收藏';
-      if (item.category === 'regret') return '未尽的小路';
+      if (item.category === 'regret') return '森林里未踏足的另一条路';
       if (item.category === 'zongce-a') return '综测 A 类目录';
       if (item.category === 'zongce-b') return '综测 B 类目录';
 
@@ -3413,7 +3413,7 @@
     }
 
     function getEditableTab() {
-      return ['小试牛刀','未尽的小路','技能·进化池','课外·云端研习','我的历程'].includes(activeTab);
+      return ['小试牛刀','森林里未踏足的另一条路','技能·进化池','课外·云端研习','我的历程'].includes(activeTab);
     }
 
     function getSortedUserData(list) {
@@ -3436,7 +3436,7 @@
       if (activeTab === '论文·学术高地') return academicPapers;
       if (activeTab === '专利·知识产权') return patents;
       if (activeTab === '小试牛刀') return getSortedUserData(userData.filter(d => d.category === 'comp'));
-      if (activeTab === '未尽的小路') return getSortedUserData(userData.filter(d => d.category === 'regret'));
+      if (activeTab === '森林里未踏足的另一条路') return getSortedUserData(userData.filter(d => d.category === 'regret'));
       if (activeTab === '技能·进化池') return getSortedUserData(userData.filter(d => d.category === 'skill'));
       if (activeTab === '课外·云端研习') return getSortedUserData(userData.filter(d => d.category === 'course'));
       if (activeTab === '我的历程') return getSortedUserData(userData);
@@ -3702,8 +3702,8 @@
       if (tab === '论文·学术高地' || tab === '专利·知识产权') {
         return { mark: '保研科技创新', title: tab, sub: 'RECOMMENDATION INNOVATION SCORE' };
       }
-      if (tab === '未尽的小路') {
-        return { mark: '未竟的心愿', title: '未尽的小路', sub: 'REGRETS & WISHLISTS · THE ROAD NOT TAKEN' };
+      if (tab === '森林里未踏足的另一条路') {
+        return { mark: '未竟的心愿', title: '森林里未踏足的另一条路', sub: 'REGRETS & WISHLISTS · THE ROAD NOT TAKEN' };
       }
       if (['小试牛刀','技能·进化池','课外·云端研习','我的历程'].includes(tab)) {
         return { mark: '个人成长记录', title: tab, sub: 'PERSONAL GROWTH TRACKING' };
@@ -3854,7 +3854,7 @@
       recordEndTime.value = '';
       recordResult.value = '';
       recordNote.value = '';
-      formCategory = activeTab === '技能·进化池' ? 'skill' : activeTab === '课外·云端研习' ? 'course' : activeTab === '未尽的小路' ? 'regret' : 'comp';
+      formCategory = activeTab === '技能·进化池' ? 'skill' : activeTab === '课外·云端研习' ? 'course' : activeTab === '森林里未踏足的另一条路' ? 'regret' : 'comp';
       renderCategoryButtons();
     }
 
@@ -3884,7 +3884,7 @@
         { id:'skill', label:'技能进化' },
         { id:'course', label:'云端研习' },
         { id:'comp', label:'个人牛刀' },
-        { id:'regret', label:'未尽小路' },
+        { id:'regret', label:'森林里另一条路' },
       ];
       categoryButtons.innerHTML = options.map(opt => `
         <button type="button" class="cat-btn ${formCategory === opt.id ? 'active' : ''}" data-cat="${opt.id}">
