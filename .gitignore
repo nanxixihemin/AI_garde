@@ -8,6 +8,9 @@ yarn-error.log*
 # Database & Runtime State (Keep your personal records private!)
 data/
 *.tmp
+.env
+.env.*
+!.env.example
 
 # Operating System files
 .DS_Store

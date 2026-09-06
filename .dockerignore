@@ -1,7 +1,6 @@
 node_modules
-npm-debug.log
-data/*.json
-data/*.tmp
+npm-debug.log*
+data/
 .git
 .gitignore
 .dockerignore
@@ -12,3 +11,12 @@ task.md
 implementation_plan.md
 CVS
 .DS_Store
+.env
+.env.*
+!.env.example
+outputs/
+.codex_tmp*/
+test/
+search_ssh.py
+*.xlsx
+*.pdf

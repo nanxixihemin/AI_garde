@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>学生档案 · AI 进阶之路</title>
+  <link rel="stylesheet" href="/students.css" />
+</head>
+<body>
+  <div class="mobile-bar">
+    <button class="icon-button" id="openSidebar" type="button" aria-label="打开导航">菜单</button>
+    <span>学生档案</span>
+    <button class="icon-button" id="mobileLock" type="button">访问</button>
+  </div>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="brand-row">
+          <a class="brand" href="/">
+            <strong>AI 进阶之路</strong>
+            <span>RECOMMENDATION CORE</span>
+          </a>
+          <button class="sidebar-close" id="closeSidebar" type="button" aria-label="关闭导航">×</button>
+        </div>
+        <nav class="sidebar-nav" aria-label="主导航">
+          <a href="/">培养方案成绩</a>
+          <div class="nav-rule"></div>
+          <a href="/">小试牛刀</a>
+          <a href="/">森林里未踏足的另一条路</a>
+          <a href="/">技能·进化池</a>
+          <a href="/">课外·云端研习</a>
+          <a href="/">我的历程</a>
+          <div class="nav-rule"></div>
+          <a class="active" href="/students.html" aria-current="page">学生档案</a>
+        </nav>
+      </div>
+      <div class="privacy-note">
+        <span>本地 SQLite</span>
+        <p>名单与成果由后端实时查询；如需限制访问，可配置环境变量口令。</p>
+        <button id="lockButton" type="button">切换访问口令</button>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">纯人工智能 · 2025级</p>
+          <h1>学生档案</h1>
+          <p class="subtitle">查名单、记成果、看加分。学号是每份档案的唯一索引。</p>
+        </div>
+        <div class="header-seal" aria-hidden="true">
+          <span>AI</span>
+          <small>ARCHIVE</small>
+        </div>
+      </header>
+
+      <section class="summary-grid" aria-label="档案概览">
+        <article class="summary-card primary">
+          <span>在册学生</span>
+          <strong id="studentCount">—</strong>
+          <small>人工智能1—6班</small>
+        </article>
+        <article class="summary-card">
+          <span>已有成果</span>
+          <strong id="recordCount">—</strong>
+          <small>获奖、论文与其他记录</small>
+        </article>
+        <article class="summary-card">
+          <span>已建成果档案</span>
+          <strong id="studentsWithRecords">—</strong>
+          <small>至少录入一项成果的学生</small>
+        </article>
+        <article class="summary-card accent">
+          <span>累计加分</span>
+          <strong id="totalPoints">—</strong>
+          <small>按成果记录实时汇总</small>
+        </article>
+      </section>
+
+      <section class="directory-panel">
+        <div class="directory-heading">
+          <div>
+            <p class="section-kicker">STUDENT DIRECTORY</p>
+            <h2>学生名录</h2>
+          </div>
+          <p id="resultMeta" class="result-meta">等待查询</p>
+        </div>
+
+        <div class="filters">
+          <label class="search-field">
+            <span>搜索</span>
+            <input id="searchInput" type="search" autocomplete="off" placeholder="输入姓名或完整学号" />
+          </label>
+          <label>
+            <span>班级</span>
+            <select id="classFilter">
+              <option value="">全部班级</option>
+            </select>
+          </label>
+          <label>
+            <span>排序</span>
+            <select id="sortSelect">
+              <option value="points_desc">加分从高到低</option>
+              <option value="gpa_desc">绩点从高到低</option>
+              <option value="name_asc">姓名顺序</option>
+              <option value="student_id_asc">学号顺序</option>
+            </select>
+          </label>
+          <button class="secondary-button" id="clearFilters" type="button">清除</button>
+        </div>
+
+        <div class="status-line" id="statusLine" role="status" aria-live="polite"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>班级</th>
+                <th>绩点</th>
+                <th>当前加分</th>
+                <th>成果</th>
+                <th><span class="sr-only">操作</span></th>
+              </tr>
+            </thead>
+            <tbody id="studentRows"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" hidden>
+            <strong>没有找到对应学生</strong>
+            <span>请检查姓名或学号，也可以清除班级筛选。</span>
+          </div>
+        </div>
+
+        <footer class="pagination">
+          <button id="previousPage" type="button">上一页</button>
+          <span id="pageMeta">第 1 页</span>
+          <button id="nextPage" type="button">下一页</button>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-layer" id="detailLayer" hidden>
+    <button class="modal-scrim" id="closeDetailScrim" type="button" aria-label="关闭学生档案"></button>
+    <section class="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="detailName">
+      <div class="detail-header">
+        <div>
+          <p id="detailClass">—</p>
+          <h2 id="detailName">学生档案</h2>
+          <span id="detailId">—</span>
+        </div>
+        <button class="close-button" id="closeDetail" type="button" aria-label="关闭">×</button>
+      </div>
+
+      <div class="detail-body">
+        <div class="detail-metrics">
+          <div><span>当前加分</span><strong id="detailPoints">0.00</strong></div>
+          <div><span>获奖</span><strong id="detailAwards">0</strong></div>
+          <div><span>论文</span><strong id="detailPapers">0</strong></div>
+        </div>
+
+        <form class="student-form" id="studentForm">
+          <label>
+            <span>绩点</span>
+            <input id="gpaInput" name="gpa" type="number" min="0" step="0.01" placeholder="尚未录入" />
+          </label>
+          <label class="wide-field">
+            <span>学生备注</span>
+            <textarea id="studentNotes" name="notes" rows="2" maxlength="1000" placeholder="选填"></textarea>
+          </label>
+          <button class="secondary-button" type="submit">保存基本信息</button>
+        </form>
+
+        <div class="record-toolbar">
+          <div>
+            <p>ACHIEVEMENTS</p>
+            <h3>成果记录</h3>
+          </div>
+          <button class="primary-button" id="addRecordButton" type="button">添加成果</button>
+        </div>
+
+        <form class="record-form" id="recordForm" hidden>
+          <input id="recordId" type="hidden" />
+          <label>
+            <span>类型</span>
+            <select id="recordType" required>
+              <option value="award">获奖</option>
+              <option value="paper">论文</option>
+              <option value="other">其他</option>
+            </select>
+          </label>
+          <label class="span-two">
+            <span>成果名称</span>
+            <input id="recordTitle" maxlength="240" required placeholder="比赛奖项、论文题目或其他成果" />
+          </label>
+          <label>
+            <span>级别 / 收录</span>
+            <input id="recordLevel" maxlength="120" placeholder="如国家级、CCF B" />
+          </label>
+          <label>
+            <span>位次 / 奖项</span>
+            <input id="recordRole" maxlength="120" placeholder="如一等奖、第一作者" />
+          </label>
+          <label>
+            <span>组织 / 期刊</span>
+            <input id="recordOrganization" maxlength="200" placeholder="主办方、期刊或会议" />
+          </label>
+          <label>
+            <span>日期</span>
+            <input id="recordDate" type="date" />
+          </label>
+          <label>
+            <span>计入加分</span>
+            <input id="recordPoints" type="number" min="0" step="0.01" value="0" required />
+          </label>
+          <label class="span-two">
+            <span>证明链接</span>
+            <input id="recordEvidence" type="url" maxlength="500" placeholder="https://" />
+          </label>
+          <label class="span-two">
+            <span>备注</span>
+            <textarea id="recordNotes" rows="2" maxlength="1000" placeholder="选填"></textarea>
+          </label>
+          <div class="form-actions span-two">
+            <button class="secondary-button" id="cancelRecord" type="button">取消</button>
+            <button class="primary-button" type="submit">保存成果</button>
+          </div>
+        </form>
+
+        <div class="record-list" id="recordList"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="gate-layer" id="gateLayer" hidden>
+    <form class="gate-card" id="gateForm">
+      <p class="section-kicker">PRIVATE ARCHIVE</p>
+      <h1>打开学生档案</h1>
+      <p>输入服务器配置的学生档案访问口令。口令只保存在当前浏览器标签页。</p>
+      <label>
+        <span>访问口令</span>
+        <input id="tokenInput" type="password" autocomplete="current-password" required autofocus />
+      </label>
+      <p class="gate-error" id="gateError" role="alert"></p>
+      <button class="primary-button" type="submit">验证并进入</button>
+      <a href="/">返回主面板</a>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/students.js" defer></script>
+</body>
+</html>

@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 const db = require('./db');
+const studentDb = require('./student-db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,6 +11,35 @@ const PORT = process.env.PORT || 3000;
 // Enable CORS and JSON parsing
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Support larger payloads for bulk sync
+
+function secureTokenEquals(candidate, expected) {
+  const candidateBuffer = Buffer.from(candidate || '', 'utf8');
+  const expectedBuffer = Buffer.from(expected || '', 'utf8');
+  return candidateBuffer.length === expectedBuffer.length
+    && crypto.timingSafeEqual(candidateBuffer, expectedBuffer);
+}
+
+function requireStudentAccess(req, res, next) {
+  const expectedToken = String(process.env.STUDENT_ADMIN_TOKEN || '').trim();
+  if (!expectedToken) {
+    return next();
+  }
+
+  const authorization = req.get('authorization') || '';
+  const candidate = authorization.startsWith('Bearer ')
+    ? authorization.slice(7).trim()
+    : '';
+  if (!secureTokenEquals(candidate, expectedToken)) {
+    return res.status(401).json({ error: '访问口令无效' });
+  }
+  next();
+}
+
+function sendStudentError(res, error) {
+  const status = Number.isInteger(error.status) ? error.status : 500;
+  if (status >= 500) console.error('Student archive error:', error.message);
+  res.status(status).json({ error: status >= 500 ? '学生档案服务暂时不可用' : error.message });
+}
 
 // REST API Endpoints
 
@@ -194,18 +225,93 @@ app.post('/api/habits', async (req, res) => {
   }
 });
 
+// Student archive APIs use a separate SQLite database and access token.
+app.get('/api/students/summary', requireStudentAccess, async (req, res) => {
+  try {
+    res.json(await studentDb.getSummary());
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
+app.get('/api/students/classes', requireStudentAccess, async (req, res) => {
+  try {
+    res.json(await studentDb.getClasses());
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
+app.get('/api/students', requireStudentAccess, async (req, res) => {
+  try {
+    res.json(await studentDb.listStudents({
+      query: req.query.q,
+      className: req.query.class_name,
+      sort: req.query.sort,
+      limit: req.query.limit,
+      offset: req.query.offset,
+    }));
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
+app.get('/api/students/:studentId', requireStudentAccess, async (req, res) => {
+  try {
+    res.json(await studentDb.getStudent(req.params.studentId));
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
+app.patch('/api/students/:studentId', requireStudentAccess, async (req, res) => {
+  try {
+    res.json({ success: true, data: await studentDb.updateStudent(req.params.studentId, req.body) });
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
+app.post('/api/students/:studentId/records', requireStudentAccess, async (req, res) => {
+  try {
+    res.status(201).json({ success: true, data: await studentDb.addRecord(req.params.studentId, req.body) });
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
+app.put('/api/student-records/:recordId', requireStudentAccess, async (req, res) => {
+  try {
+    res.json({ success: true, data: await studentDb.updateRecord(req.params.recordId, req.body) });
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
+app.delete('/api/student-records/:recordId', requireStudentAccess, async (req, res) => {
+  try {
+    res.json({ success: true, data: await studentDb.deleteRecord(req.params.recordId) });
+  } catch (error) {
+    sendStudentError(res, error);
+  }
+});
+
 // Serve frontend static assets from public/ directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Catch-all route to serve public/index.html
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start backend server
-app.listen(PORT, () => {
-  console.log(`==================================================`);
-  console.log(` AI Evolution Stage Backend Server is running!`);
-  console.log(` Local URL: http://localhost:${PORT}`);
-  console.log(`==================================================`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`==================================================`);
+    console.log(` AI Evolution Stage Backend Server is running!`);
+    console.log(` Local URL: http://localhost:${PORT}`);
+    console.log(`==================================================`);
+  });
+}
+
+module.exports = app;

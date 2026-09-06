@@ -20,6 +20,7 @@
     *   **离线双击模式**：即便在无网络的本地环境下，直接双击 `public/index.html` (使用 `file://` 协议) 也能完美运行！系统内置了全部 105 个竞赛的离线数据种子，支持数据就地查看与手动导出备份。
 *    **企业级容器化部署**：原生支持 Docker & Docker Compose，一行命令即可拉起服务，并内置 `/data` 目录卷映射以确保用户数据永不丢失。
 *    **高安全性隔离**：所有个人填报的成绩、自定义课程、打卡与里程碑记录均存储在被 `.gitignore` 排除的本地 `data/` 目录中，杜绝任何个人隐私泄露到 GitHub 开源社区的可能。
+*    **学生档案库**：使用 SQLite 保存人工智能专业学生、绩点、获奖、论文和其他加分记录，支持姓名/学号查询、班级筛选、加分或绩点排序。
 
 ---
 
@@ -52,7 +53,7 @@ docker compose up -d --build
 如果您不想使用 Docker，可以直接在服务器上通过 Node.js 运行：
 
 #### 1. 安装依赖
-确保服务器已安装 Node.js (推荐 v18 或以上)。
+确保服务器已安装 Node.js 20.17 或以上。
 ```bash
 git clone https://github.com/nanxixihemin/AI_garde.git
 cd AI_garde
@@ -106,20 +107,34 @@ pm2 startup
 ```text
 AI_stage/
 ├── data/                               # 宿主机私人填报数据目录（已加入 .gitignore，安全隔离）
+│   ├── students.sqlite                 # 学生档案 SQLite 数据库
 │   ├── plan_scores.json                # 各科目填报成绩
 │   ├── core_course_names.json          # 自定义核心课程名称
 │   ├── user_data.json                  # 备考打卡、竞赛里程碑记录
 │   └── competition_details.json        # 105项竞赛自定义备考与赛道详情
 ├── default_competition_details.json    # 105项竞赛官方原始数据种子备份 (系统自愈使用)
+├── student_seed.json                   # 286名纯人工智能学生的首次启动种子
 ├── public/
-│   └── index.html                      # 单页面前端主控板（集成了离线种子，支持双击本地直接运行）
+│   ├── index.html                      # 单页面前端主控板（集成了离线种子，支持双击本地直接运行）
+│   ├── students.html                   # 学生查询与成果录入页面
+│   ├── students.css                    # 学生档案页面样式
+│   └── students.js                     # 学生档案页面交互
 ├── db.js                               # 原子性全异步 JSON 数据库引擎
+├── student-db.js                       # SQLite 学生档案数据层
 ├── server.js                           # 轻量高效 Express 全栈静态与 API 服务器
 ├── Dockerfile                          # Docker 构建定义文件
 ├── docker-compose.yml                  # 容器卷映射与一键编排脚本
 ├── .gitignore                          # Git 忽略配置
 └── README.md                           # 本说明文档
 ```
+
+## 学生档案
+
+启动服务后访问 `http://localhost:3000/students.html`。主面板左侧导航也提供“学生档案”入口。
+
+学生表以学号为唯一键。每项获奖、论文或其他加分单独保存为一条成果记录；学生列表中的“当前加分”、获奖数和论文数由 SQLite 实时汇总。列表支持按姓名或学号查询，并可按当前加分、绩点、姓名或学号排序。
+
+默认无需口令即可访问。如果以后需要限制访问，在启动服务前设置 `STUDENT_ADMIN_TOKEN`；页面会自动弹出访问口令输入框。不要把真实口令写入 Git，`.env.example` 只保留空白配置示例。
 
 ---
 

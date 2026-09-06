@@ -16,3 +16,5 @@ services:
       - ./data:/app/data
     environment:
       - PORT=3000
+      # Optional: leave empty for direct access, or set a token to protect student APIs.
+      - STUDENT_ADMIN_TOKEN=${STUDENT_ADMIN_TOKEN:-}
